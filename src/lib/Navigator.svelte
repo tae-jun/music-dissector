@@ -23,6 +23,7 @@
     frames = energy.low.length - 1
 
     draw()
+    drawTimebar()
   })
 
   function draw() {
@@ -86,11 +87,11 @@
 </script>
 
 <div class="w-full h-8 flex">
-  <div class="w-12 h-full">{name}</div>
   <div class="relative grow h-full">
     <canvas id="energy" class="absolute h-full w-full" bind:this={energyCanvas} />
     <canvas class="absolute h-full w-full" bind:this={timebarCanvas} on:mousedown={seek} />
   </div>
+  <div class="w-20 h-full">{name}</div>
 </div>
 
 <svelte:window on:resize={draw} />

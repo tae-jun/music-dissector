@@ -2,53 +2,89 @@
   import { setContext, afterUpdate, onMount, tick } from 'svelte'
   import { currentTime, duration, paused } from '$lib/stores'
 
-  export let labels: Array<string>
-  export let boundaries: Array<number>
+  export let name: string
+  export let upper: boolean = false
+  export let labels: string[]
+  export let boundaries: number[]
 
-  const margin = 0.2 // rem
-  const fontsize = 1 // rem
+  let texts: string[] = []
+  let positions: number[] = []
+  let div: HTMLDivElement
 
-  let canvas: HTMLCanvasElement
-  let ctx: CanvasRenderingContext2D
-  let width: number
-  let height: number
-  let dpr: number
-  let rect: DOMRect
+  // Exclude labels and boundaries if the label is 'start' or 'end'
+  const filteredLabels = labels.filter((label) => label !== 'start' && label !== 'end')
+  boundaries = boundaries.filter((_, i) => {
+    const label = labels[i]
+    return label !== 'start' && label !== 'end'
+  })
+  labels = filteredLabels
 
-  onMount(draw)
+  onMount(() => {
+    texts = labels.map((label) => label.charAt(0).toUpperCase() + label.slice(1))
+    onResize()
+  })
 
-  function draw() {
-    ctx = canvas.getContext('2d') as CanvasRenderingContext2D
-    dpr = window.devicePixelRatio || 1
-    rect = canvas.getBoundingClientRect()
-    width = canvas.width = rect.width * dpr
-    height = canvas.height = rect.height * dpr
-
+  function onResize() {
+    const rect = div.getBoundingClientRect()
+    const witdh = rect.width
     const duration = boundaries[boundaries.length - 1]
-    const rem = parseInt(getComputedStyle(document.documentElement).fontSize)
-    const marginPx = margin * rem * dpr
+    positions = boundaries.map((boundary) => Math.round((boundary / duration) * witdh))
+  }
 
-    for (const i in labels) {
-      const label = labels[i].toLowerCase()
-      const text = label.charAt(0).toUpperCase() + label.slice(1)
-      const boundary = boundaries[i]
-      const x = (boundary / duration) * width
-      const textWidth = ctx.measureText(text).width
-
-      ctx.fillStyle = 'red'
-      ctx.fillRect(x, 0, textWidth + marginPx * 2, height)
-      ctx.fillStyle = 'white'
-      ctx.font = `${fontsize * dpr}rem Arial`
-      ctx.fillText(text, x + marginPx, height - marginPx)
-    }
+  function onClick(i: number) {
+    console.log(i)
+    $currentTime = boundaries[i]
+    if ($paused) $paused = false
   }
 </script>
 
-<div class="w-full h-[{fontsize + margin}rem] flex">
-  <div class="w-12 h-full" />
-  <div class="relative grow h-full">
-    <canvas class="absolute h-full w-full" bind:this={canvas} />
+<div class="w-full h-[1.2rem] flex">
+  <div class="relative grow h-full" bind:this={div}>
+    {#each texts as text, i}
+      <!-- svelte-ignore a11y-click-events-have-key-events -->
+      <div
+        class="labelbox flex flex-row"
+        style:left={positions[i] + 'px'}
+        on:click={() => onClick(i)}
+      >
+        <div class="labelbox-body">{text}</div>
+        {#if upper}
+          <div class="labelbox-tail-upper" />
+        {:else}
+          <div class="labelbox-tail-lower" />
+        {/if}
+      </div>
+    {/each}
   </div>
+  <div class="w-20 h-full z-10">{name}</div>
 </div>
 
-<svelte:window on:resize={draw} />
+<svelte:window on:resize={onResize} />
+
+<style>
+  .labelbox {
+    @apply absolute;
+
+    cursor: pointer;
+    transition: 100ms ease-in-out;
+  }
+  .labelbox:hover {
+    filter: brightness(150%);
+  }
+  .labelbox-body {
+    font-size: 1rem;
+    line-height: 1rem;
+    padding-left: 0.2rem;
+    padding-right: 0.2rem;
+    padding-top: 0.07rem;
+    background-color: green;
+  }
+  .labelbox-tail-upper {
+    border-bottom: 1.2rem solid green;
+    border-right: 1.2rem solid transparent;
+  }
+  .labelbox-tail-lower {
+    border-top: 1.2rem solid green;
+    border-right: 1.2rem solid transparent;
+  }
+</style>
