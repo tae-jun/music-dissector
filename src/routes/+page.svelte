@@ -89,6 +89,18 @@
     {/if}
   </button>
   {$currentTime}
+  <div>
+    Beat F1: {data.scores.beat.f1}
+  </div>
+  <div>
+    Downbeat F1: {data.scores.downbeat.f1}
+  </div>
+  <div>
+    Segment F1 @ 0.5s: {data.scores.segment['F-measure@0.5']}
+  </div>
+  <div>
+    Labeling Pairwise F-measure: {data.scores.segment['Pairwise F-measure']}
+  </div>
 {/if}
 
 <svelte:window on:keydown={handleKeydown} />
