@@ -1,107 +1,97 @@
 <script lang="ts">
+  import * as THREE from 'three'
   import { onMount } from 'svelte'
   import { currentTime, paused } from '$lib/stores'
-  import { FPS, WINDOW_SECONDS, FRAMES_PER_WINDOW, BEAT_TOLERANCE, COLOR } from '$lib/config'
+  import { FPS, FRAMES_PER_WINDOW, COLOR } from '$lib/config'
 
   export let name: string
-  export let wav: { [key: string]: Array<number> }
-
-  export let colorLow: string = 'MediumBlue'
-  export let colorMid: string = 'Orange'
-  export let colorHigh: string = 'Snow'
+  export let wav: { [key: string]: number[] }
 
   let mounted = false
+
   let canvas: HTMLCanvasElement
-  let ctx: CanvasRenderingContext2D
+  let camera: THREE.OrthographicCamera
+  let scene: THREE.Scene
+  let renderer: THREE.WebGLRenderer
 
   let width: number
   let height: number
   let dpr: number
   let hopSize: number
 
-  const totalFrames: number = wav.low.length
-  let centerFrame: number
-  let centerX: number
-  let padding: number
-  let startFrame: number
-  let endFrame: number
-
-  let currentWaveLow: [number, number][]
-  let currentWaveMid: [number, number][]
-  let currentWaveHigh: [number, number][]
-
   $: if (!$paused) {
-    draw()
+    animate()
   }
 
   onMount(() => {
     dpr = window.devicePixelRatio || 1
     mounted = true
 
-    setupSize()
-    draw()
+    resize()
+    animate()
   })
 
   function onResize() {
-    setupSize()
-    if ($paused) draw()
+    resize()
+    if (!$paused) animate()
   }
 
-  function setupSize() {
+  function animate() {
+    if (!$paused) requestAnimationFrame(animate)
+    camera.position.x = $currentTime * FPS * hopSize
+    renderer.render(scene, camera)
+  }
+
+  function resize() {
     const rect = canvas.getBoundingClientRect()
-    width = canvas.width = rect.width * dpr
-    height = canvas.height = rect.height * dpr
+    width = canvas.width = rect.width
+    height = canvas.height = rect.height
     hopSize = width / FRAMES_PER_WINDOW
-    ctx = canvas.getContext('2d') as CanvasRenderingContext2D
+
+    camera = new THREE.OrthographicCamera(width / -2, width / 2, height / 2, height / -2, 1, 1000)
+    camera.position.set($currentTime * FPS * hopSize, 0, height)
+
+    scene = new THREE.Scene()
+    scene.background = new THREE.Color(COLOR.WAV_BACKGROUND)
+
+    renderer = new THREE.WebGLRenderer({
+      antialias: true,
+      canvas,
+    })
+    renderer.setPixelRatio(dpr)
+
+    drawWave(wav.low, COLOR.WAV_LOW, COLOR.WAV_LOW_OPACITY)
+    drawWave(wav.mid, COLOR.WAV_MID, COLOR.WAV_MID_OPACITY)
+    drawWave(wav.high, COLOR.WAV_HIGH, COLOR.WAV_HIGH_OPACITY)
   }
 
-  function draw() {
-    if (!mounted) return
+  function drawWave(wave: number[], color: string, opacity: number) {
+    const shape = new THREE.Shape()
+    shape.moveTo(0, 0)
+    wave.forEach((v, i) => {
+      shape.lineTo(i * hopSize, (v / 256) * height)
+    })
+    shape.lineTo((wave.length - 1) * hopSize, 0)
+    shape.lineTo(0, 0)
 
-    centerFrame = Math.round($currentTime * FPS)
-    centerX = centerFrame * hopSize
-    padding = Math.max(0, (WINDOW_SECONDS * FPS * hopSize) / 2 - centerX)
-    startFrame = Math.max(0, centerFrame - FRAMES_PER_WINDOW / 2)
-    endFrame = Math.min(totalFrames, centerFrame + FRAMES_PER_WINDOW / 2)
+    const geometryUpper = new THREE.ShapeGeometry(shape)
 
-    currentWaveLow = getCurrentWaveformPoints(wav.low)
-    currentWaveMid = getCurrentWaveformPoints(wav.mid)
-    currentWaveHigh = getCurrentWaveformPoints(wav.high)
+    const geometryLower = geometryUpper.clone()
+    geometryLower.scale(1, -1, 1)
 
-    ctx.clearRect(0, 0, width, height)
+    const material = new THREE.MeshBasicMaterial({
+      color,
+      opacity,
+      transparent: true,
+      side: THREE.DoubleSide,
+      depthWrite: false,
+    })
 
-    drawWaveform(currentWaveLow, colorLow, COLOR.WAV_LOW)
-    drawWaveform(currentWaveMid, colorMid, COLOR.WAV_MID)
-    drawWaveform(currentWaveHigh, colorHigh, COLOR.WAV_HIGH)
+    const meshUpper = new THREE.Mesh(geometryUpper, material)
+    const meshLower = new THREE.Mesh(geometryLower, material)
 
-    if (!$paused) requestAnimationFrame(draw)
-
-    function getCurrentWaveformPoints(wave: number[]): [number, number][] {
-      return wave
-        .slice(startFrame, endFrame)
-        .map((v, i) => [i * hopSize + padding + hopSize / 2, (v / 255) * height])
-    }
-  }
-
-  function drawWaveform(points: [number, number][], color: string, alpha: string) {
-    ctx.save()
-    ctx.strokeStyle = color
-    ctx.fillStyle = color
-    ctx.fillStyle = ctx.fillStyle + alpha
-
-    ctx.beginPath()
-    ctx.moveTo(padding, height)
-    for (const [x, y] of points) {
-      ctx.lineTo(x, height - y)
-    }
-    ctx.stroke()
-
-    // Fill the area under the line graph
-    ctx.lineTo(points[points.length - 1][0], height)
-    ctx.lineTo(points[0][1], height)
-    ctx.closePath()
-    ctx.fill()
-    ctx.restore()
+    scene.add(meshUpper)
+    scene.add(meshLower)
   }
 </script>
 
