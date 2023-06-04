@@ -1,5 +1,5 @@
 export const FPS = 100
-export const WINDOW_SECONDS = 8
+export const WINDOW_SECONDS = 12
 export const FRAMES_PER_WINDOW = FPS * WINDOW_SECONDS
 export const BEAT_TOLERANCE = 0.04
 

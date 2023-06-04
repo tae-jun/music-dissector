@@ -7,6 +7,7 @@
   import { currentTime, paused, duration } from '$lib/stores'
   import Labels from '$lib/Labels.svelte'
   import Waveform from '$lib/Waveform.svelte'
+  import WaveformGrid from '$lib/WaveformGrid.svelte'
 
   export let data
 
@@ -41,38 +42,22 @@
 
   <Labels name="AI" labels={data.inferences.labels} boundaries={data.inferences.segments} />
 
-  <Waveform
-    name="Drum"
-    wav={data.wav.drum}
-    predBeats={data.inferences.beats}
-    predDownbeats={data.inferences.downbeats}
-    trueBeats={data.truths.beats}
-    trueDownbeats={data.truths.downbeats}
-  />
-  <Waveform
-    name="Bass"
-    wav={data.wav.bass}
-    predBeats={data.inferences.beats}
-    predDownbeats={data.inferences.downbeats}
-    trueBeats={data.truths.beats}
-    trueDownbeats={data.truths.downbeats}
-  />
-  <Waveform
-    name="Vocal"
-    wav={data.wav.vocal}
-    predBeats={data.inferences.beats}
-    predDownbeats={data.inferences.downbeats}
-    trueBeats={data.truths.beats}
-    trueDownbeats={data.truths.downbeats}
-  />
-  <Waveform
-    name="Other"
-    wav={data.wav.other}
-    predBeats={data.inferences.beats}
-    predDownbeats={data.inferences.downbeats}
-    trueBeats={data.truths.beats}
-    trueDownbeats={data.truths.downbeats}
-  />
+  <div class="relative h-96 w-full">
+    <div class="absolute w-full">
+      <Waveform name="Drum" wav={data.wav.drum} />
+      <Waveform name="Bass" wav={data.wav.bass} />
+      <Waveform name="Vocal" wav={data.wav.vocal} />
+      <Waveform name="Other" wav={data.wav.other} />
+    </div>
+    <div class="absolute w-full h-96">
+      <WaveformGrid
+        predBeats={data.inferences.beats}
+        predDownbeats={data.inferences.downbeats}
+        trueBeats={data.truths.beats}
+        trueDownbeats={data.truths.downbeats}
+      />
+    </div>
+  </div>
 
   <audio
     src={audioUrl}
@@ -88,7 +73,9 @@
       <Icon icon="ph:pause" />
     {/if}
   </button>
+
   {$currentTime}
+
   <div>
     Beat F1: {data.scores.beat.f1}
   </div>
