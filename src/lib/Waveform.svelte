@@ -20,6 +20,15 @@
   let hopSize: number
 
   const totalFrames: number = wav.low.length
+  let centerFrame: number
+  let centerX: number
+  let padding: number
+  let startFrame: number
+  let endFrame: number
+
+  let currentWaveLow: [number, number][]
+  let currentWaveMid: [number, number][]
+  let currentWaveHigh: [number, number][]
 
   $: if (!$paused) {
     draw()
@@ -49,28 +58,32 @@
   function draw() {
     if (!mounted) return
 
+    centerFrame = Math.round($currentTime * FPS)
+    centerX = centerFrame * hopSize
+    padding = Math.max(0, (WINDOW_SECONDS * FPS * hopSize) / 2 - centerX)
+    startFrame = Math.max(0, centerFrame - FRAMES_PER_WINDOW / 2)
+    endFrame = Math.min(totalFrames, centerFrame + FRAMES_PER_WINDOW / 2)
+
+    currentWaveLow = getCurrentWaveformPoints(wav.low)
+    currentWaveMid = getCurrentWaveformPoints(wav.mid)
+    currentWaveHigh = getCurrentWaveformPoints(wav.high)
+
     ctx.clearRect(0, 0, width, height)
 
-    drawWaveform(wav.low, colorLow, COLOR.WAV_LOW)
-    drawWaveform(wav.mid, colorMid, COLOR.WAV_MID)
-    drawWaveform(wav.high, colorHigh, COLOR.WAV_HIGH)
+    drawWaveform(currentWaveLow, colorLow, COLOR.WAV_LOW)
+    drawWaveform(currentWaveMid, colorMid, COLOR.WAV_MID)
+    drawWaveform(currentWaveHigh, colorHigh, COLOR.WAV_HIGH)
 
     if (!$paused) requestAnimationFrame(draw)
+
+    function getCurrentWaveformPoints(wave: number[]): [number, number][] {
+      return wave
+        .slice(startFrame, endFrame)
+        .map((v, i) => [i * hopSize + padding + hopSize / 2, (v / 255) * height])
+    }
   }
 
-  function drawWaveform(wave: Array<number>, color: string, alpha: string) {
-    const centerFrame = Math.round($currentTime * FPS)
-    const centerX = centerFrame * hopSize
-    const padding = Math.max(0, (WINDOW_SECONDS * FPS * hopSize) / 2 - centerX)
-    const startFrame = Math.max(0, centerFrame - FRAMES_PER_WINDOW / 2)
-    const endFrame = Math.min(totalFrames, centerFrame + FRAMES_PER_WINDOW / 2)
-    const windowWave = wave.slice(startFrame, endFrame)
-    const points = windowWave.map((v, i) => {
-      const x = i * hopSize + padding + hopSize / 2
-      const y = (v / 255) * height
-      return [x, y]
-    })
-
+  function drawWaveform(points: [number, number][], color: string, alpha: string) {
     ctx.save()
     ctx.strokeStyle = color
     ctx.fillStyle = color
@@ -78,8 +91,8 @@
 
     ctx.beginPath()
     ctx.moveTo(padding, height)
-    for (let i = 0; i < points.length; i++) {
-      ctx.lineTo(points[i][0], height - points[i][1])
+    for (const [x, y] of points) {
+      ctx.lineTo(x, height - y)
     }
     ctx.stroke()
 
