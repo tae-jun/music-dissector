@@ -8,6 +8,16 @@
   import { AppShell, AppBar } from '@skeletonlabs/skeleton'
 
   import { page } from '$app/stores'
+
+  import tracks from '$lib/tracks'
+  import { goto, invalidateAll } from '$app/navigation'
+
+  let selected: string
+
+  async function redirect(event: Event) {
+    await invalidateAll()
+    await goto(selected)
+  }
 </script>
 
 <!-- App Shell -->
@@ -21,13 +31,16 @@
         </a>
       </svelte:fragment>
 
-      {#if $page.url.pathname === '/'}
-        <select class="select">
-          <option value="1">NewJeans - Hype Boy</option>
+      {#if $page.url.pathname !== '/about'}
+        <select class="select" bind:value={selected} on:change={redirect}>
+          {#each tracks as track}
+            <option value={track}>{track}</option>
+          {/each}
+          <!-- <option value="1">NewJeans - Hype Boy</option>
           <option value="2">Option 2</option>
           <option value="3">Option 3</option>
           <option value="4">Option 4</option>
-          <option value="5">Option 5</option>
+          <option value="5">Option 5</option> -->
         </select>
       {/if}
 

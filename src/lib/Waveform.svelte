@@ -1,6 +1,6 @@
 <script lang="ts">
   import * as THREE from 'three'
-  import { onMount } from 'svelte'
+  import { onMount, onDestroy } from 'svelte'
   import { currentTime, paused } from '$lib/stores'
   import { FPS, FRAMES_PER_WINDOW, COLOR } from '$lib/config'
 
@@ -31,18 +31,37 @@
     animate()
   })
 
+  onDestroy(() => {
+    dispose()
+  })
+
   function onResize() {
     resize()
     if (!$paused) animate()
   }
 
   function animate() {
+    if (!canvas) return
     if (!$paused) requestAnimationFrame(animate)
     camera.position.x = $currentTime * FPS * hopSize
     renderer.render(scene, camera)
   }
 
+  function dispose() {
+    if (renderer) renderer.dispose()
+    if (scene)
+      scene.traverse((obj) => {
+        if (obj instanceof THREE.Mesh) {
+          console.log(obj)
+          obj.geometry.dispose()
+          obj.material.dispose()
+        }
+      })
+  }
+
   function resize() {
+    dispose()
+
     const rect = canvas.getBoundingClientRect()
     width = canvas.width = rect.width
     height = canvas.height = rect.height
@@ -52,13 +71,13 @@
     camera.position.set($currentTime * FPS * hopSize, 0, height)
 
     scene = new THREE.Scene()
-    scene.background = new THREE.Color(COLOR.WAV_BACKGROUND)
 
     renderer = new THREE.WebGLRenderer({
       antialias: true,
       canvas,
     })
     renderer.setPixelRatio(dpr)
+    renderer.setClearColor(COLOR.WAV_BACKGROUND, 1)
 
     drawWave(wav.low, COLOR.WAV_LOW, COLOR.WAV_LOW_OPACITY)
     drawWave(wav.mid, COLOR.WAV_MID, COLOR.WAV_MID_OPACITY)

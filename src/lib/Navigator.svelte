@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from 'svelte'
+  import { onMount, onDestroy } from 'svelte'
   import { currentTime, duration, paused } from '$lib/stores'
 
   export let name: string
@@ -61,6 +61,9 @@
   }
 
   function drawTimebar() {
+    if (!timebarCanvas) return
+    if (!$paused) requestAnimationFrame(drawTimebar)
+
     const x = ($currentTime / $duration) * width
     const ctx = timebarCanvas.getContext('2d') as CanvasRenderingContext2D
     timebarCanvas.width = width
@@ -73,13 +76,11 @@
     ctx.moveTo(x, 0)
     ctx.lineTo(x, height)
     ctx.stroke()
-
-    if (!$paused) requestAnimationFrame(drawTimebar)
   }
 
   function seek(event: MouseEvent) {
     console.log(event)
-    if ($paused) $paused = false
+    $paused = false
 
     const rect = energyCanvas.getBoundingClientRect()
     $currentTime = ($duration * event.offsetX) / rect.width
