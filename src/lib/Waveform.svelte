@@ -1,7 +1,7 @@
 <script lang="ts">
   import * as THREE from 'three'
   import { onMount, onDestroy } from 'svelte'
-  import { paused, solos } from '$lib/stores'
+  import { paused, mutes } from '$lib/stores'
   import { FPS, FRAMES_PER_WINDOW, COLOR } from '$lib/config'
   import { getPlaybackTime } from './AudioContext.svelte'
 
@@ -116,7 +116,7 @@
   }
 
   function onClickSoloButton(index: number) {
-    $solos[index] = !$solos[index]
+    $mutes[index] = !$mutes[index]
   }
 </script>
 
@@ -129,8 +129,8 @@
     <button
       type="button"
       class="btn"
-      class:variant-filled-primary={$solos[index]}
-      class:variant-ghost-primary={!$solos[index]}
+      class:variant-filled-primary={!$mutes[index]}
+      class:variant-ghost-primary={$mutes[index]}
       on:click={() => onClickSoloButton(index)}
     >
       S

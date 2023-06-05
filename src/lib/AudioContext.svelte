@@ -1,7 +1,7 @@
 <script context="module" lang="ts">
   import { browser } from '$app/environment'
   import { get } from 'svelte/store'
-  import { paused, duration, solos } from '$lib/stores'
+  import { paused, duration, mutes } from '$lib/stores'
   import { BASE_AUDIO_URL } from './config'
   import { onDestroy, onMount } from 'svelte'
 
@@ -24,7 +24,7 @@
       }
     })
 
-    solos.subscribe((solos) => applySolos(solos))
+    mutes.subscribe((mutes) => applyMutes(mutes))
   }
 
   function destroySources() {
@@ -75,14 +75,28 @@
     await loadAudioFiles([mixdownUrl, ...stemUrls])
   }
 
-  function applySolos(solos: boolean[]) {
+  function applyMutes(mutes: boolean[]) {
+    // gainNodes are not initialized at the beginning
     if (gainNodes.length === 0) return
-    // Mute the first gainNode if any solo is true
-    gainNodes[0].gain.value = solos.some((solo) => solo) ? 0 : 1
-    // Set the gain of the other gainNodes to the solo value
-    solos.forEach((solo, i) => {
-      gainNodes[i + 1].gain.value = solo ? 1 : 0
-    })
+
+    const [mixdownGainNode, ...stemGainNodes] = gainNodes
+    const allActivated = mutes.every((mute) => !mute)
+
+    if (allActivated) {
+      // Unmute the mixdown gain node
+      mixdownGainNode.gain.value = 1
+      // Mute all stem gain nodes
+      for (const gainNode of stemGainNodes) {
+        gainNode.gain.value = 0
+      }
+    } else {
+      // Mute the mixdown gain node
+      mixdownGainNode.gain.value = 0
+      // Unmute stem gain nodes based on mute values
+      for (const [i, mute] of mutes.entries()) {
+        stemGainNodes[i].gain.value = mute ? 0 : 1
+      }
+    }
   }
 
   function startPlaying() {
@@ -102,7 +116,7 @@
       sources.push(source)
       gainNodes.push(gainNode)
     })
-    applySolos(get(solos))
+    applyMutes(get(mutes))
 
     startTime = audioCtx.currentTime
     paused.set(false)
@@ -137,8 +151,6 @@
 
 <script lang="ts">
   export let trackId: string
-
-  $: console.log($solos)
 
   onMount(async () => {
     await loadTrackAudioFiles(trackId)
