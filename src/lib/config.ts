@@ -12,3 +12,5 @@ export const COLOR = {
   WAV_MID_OPACITY: 0.8,
   WAV_HIGH_OPACITY: 0.5,
 }
+
+export const BASE_AUDIO_URL = 'https://taejun-allinone-demo.s3.ap-northeast-2.amazonaws.com'

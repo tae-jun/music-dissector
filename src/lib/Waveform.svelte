@@ -1,8 +1,9 @@
 <script lang="ts">
   import * as THREE from 'three'
   import { onMount, onDestroy } from 'svelte'
-  import { currentTime, paused } from '$lib/stores'
+  import { paused } from '$lib/stores'
   import { FPS, FRAMES_PER_WINDOW, COLOR } from '$lib/config'
+  import { getPlaybackTime } from './AudioContext.svelte'
 
   export let name: string
   export let wav: { [key: string]: number[] }
@@ -44,7 +45,7 @@
   function animate() {
     if (!mounted) return
     if (!$paused) requestAnimationFrame(animate)
-    camera.position.x = $currentTime * FPS * hopSize
+    camera.position.x = getPlaybackTime() * FPS * hopSize
     renderer.render(scene, camera)
   }
 
@@ -68,7 +69,7 @@
     hopSize = width / FRAMES_PER_WINDOW
 
     camera = new THREE.OrthographicCamera(width / -2, width / 2, height / 2, height / -2, 1, 1000)
-    camera.position.set($currentTime * FPS * hopSize, 0, height)
+    camera.position.set(getPlaybackTime() * FPS * hopSize, 0, height)
 
     scene = new THREE.Scene()
 

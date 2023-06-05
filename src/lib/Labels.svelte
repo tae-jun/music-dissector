@@ -1,6 +1,7 @@
 <script lang="ts">
-  import { setContext, afterUpdate, onMount, tick } from 'svelte'
-  import { currentTime, duration, paused } from '$lib/stores'
+  import { onMount } from 'svelte'
+  import { paused } from '$lib/stores'
+  import { seekTo } from './AudioContext.svelte'
 
   export let name: string
   export let upper: boolean = false
@@ -33,7 +34,7 @@
 
   function onClick(i: number) {
     console.log(i)
-    $currentTime = boundaries[i]
+    seekTo(boundaries[i])
     if ($paused) $paused = false
   }
 </script>

@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte'
-  import { currentTime, duration, paused } from '$lib/stores'
+  import { duration, paused } from '$lib/stores'
+  import { getPlaybackTime, seekTo } from './AudioContext.svelte'
 
   export let name: string
   export let energy: { [key: string]: Array<number> }
@@ -64,7 +65,7 @@
     if (!timebarCanvas) return
     if (!$paused) requestAnimationFrame(drawTimebar)
 
-    const x = ($currentTime / $duration) * width
+    const x = (getPlaybackTime() / $duration) * width
     const ctx = timebarCanvas.getContext('2d') as CanvasRenderingContext2D
     timebarCanvas.width = width
     timebarCanvas.height = height
@@ -83,7 +84,7 @@
     $paused = false
 
     const rect = energyCanvas.getBoundingClientRect()
-    $currentTime = ($duration * event.offsetX) / rect.width
+    seekTo(($duration * event.offsetX) / rect.width)
   }
 </script>
 

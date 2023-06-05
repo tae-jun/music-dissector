@@ -1,7 +1,8 @@
 <script lang="ts">
   import { onDestroy, onMount } from 'svelte'
-  import { currentTime, paused } from '$lib/stores'
+  import { paused } from '$lib/stores'
   import { FPS, WINDOW_SECONDS, FRAMES_PER_WINDOW, BEAT_TOLERANCE, COLOR } from '$lib/config'
+  import { getPlaybackTime } from './AudioContext.svelte'
 
   export let predBeats: number[]
   export let predDownbeats: number[]
@@ -68,10 +69,11 @@
   }
 
   function drawGrid(gridLines: GridLine[], color: string, dottedLine: boolean = false) {
-    const centerFrame = Math.round($currentTime * FPS)
+    const playbackTime = getPlaybackTime()
+    const centerFrame = Math.round(playbackTime * FPS)
     const centerX = centerFrame * hopSize
-    const start = $currentTime - WINDOW_SECONDS / 2
-    const end = $currentTime + WINDOW_SECONDS / 2
+    const start = playbackTime - WINDOW_SECONDS / 2
+    const end = playbackTime + WINDOW_SECONDS / 2
     const startIndex = gridLines.findIndex((t) => t.pred >= start)
     const endIndex = gridLines.findIndex((t) => t.pred >= end)
 
