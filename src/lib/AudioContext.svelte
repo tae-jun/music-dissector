@@ -1,13 +1,14 @@
 <script context="module" lang="ts">
   import { browser } from '$app/environment'
   import { get } from 'svelte/store'
-  import { paused, duration } from '$lib/stores'
+  import { paused, duration, solos } from '$lib/stores'
   import { BASE_AUDIO_URL } from './config'
   import { onDestroy, onMount } from 'svelte'
 
   export let audioCtx: AudioContext
 
   let sources: AudioBufferSourceNode[] = []
+  let gainNodes: GainNode[] = []
   let audioBuffers: AudioBuffer[] = []
   let startTime: number = 0
   let offsetTime: number = 0
@@ -22,6 +23,8 @@
         startPlaying()
       }
     })
+
+    solos.subscribe((solos) => applySolos(solos))
   }
 
   function destroySources() {
@@ -69,21 +72,37 @@
     const stemUrls = ['drums', 'bass', 'vocals', 'other'].map(
       (stem) => `${BASE_AUDIO_URL}/demixed/${trackId}/${stem}.mp3`,
     )
-    // await loadAudioFiles([mixdownUrl, ...stemUrls])
-    // await loadAudioFiles(stemUrls)
-    await loadAudioFiles([mixdownUrl])
-    // await loadAudioFiles(stemUrls.slice(0, 1))
+    await loadAudioFiles([mixdownUrl, ...stemUrls])
+  }
+
+  function applySolos(solos: boolean[]) {
+    if (gainNodes.length === 0) return
+    // Mute the first gainNode if any solo is true
+    gainNodes[0].gain.value = solos.some((solo) => solo) ? 0 : 1
+    // Set the gain of the other gainNodes to the solo value
+    solos.forEach((solo, i) => {
+      gainNodes[i + 1].gain.value = solo ? 1 : 0
+    })
   }
 
   function startPlaying() {
-    sources = audioBuffers.map((audioBuffer) => {
+    sources = []
+    gainNodes = []
+
+    audioBuffers.forEach((audioBuffer) => {
       let source = audioCtx.createBufferSource()
       source.buffer = audioBuffer
-      source.connect(audioCtx.destination)
-      console.log('offsetTime', offsetTime)
+
+      let gainNode = audioCtx.createGain()
+      source.connect(gainNode)
+      gainNode.connect(audioCtx.destination)
+
       source.start(0, offsetTime)
-      return source
+
+      sources.push(source)
+      gainNodes.push(gainNode)
     })
+    applySolos(get(solos))
 
     startTime = audioCtx.currentTime
     paused.set(false)
@@ -118,6 +137,8 @@
 
 <script lang="ts">
   export let trackId: string
+
+  $: console.log($solos)
 
   onMount(async () => {
     await loadTrackAudioFiles(trackId)

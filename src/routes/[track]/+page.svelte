@@ -6,12 +6,10 @@
   import Waveform from '$lib/Waveform.svelte'
   import WaveformGrid from '$lib/WaveformGrid.svelte'
   import { page } from '$app/stores'
-  import AudioContext, { getPlaybackTime } from '$lib/AudioContext.svelte'
+  import AudioContext from '$lib/AudioContext.svelte'
   import TimeDisplay from '$lib/TimeDisplay.svelte'
 
   export let data
-
-  let audio: HTMLAudioElement
 
   function handleKeydown(event: KeyboardEvent) {
     if (event.code === 'Space') {
@@ -40,10 +38,10 @@
 
     <div class="relative h-96 w-full">
       <div class="absolute w-full">
-        <Waveform name="Drum" wav={data.wav.drum} />
-        <Waveform name="Bass" wav={data.wav.bass} />
-        <Waveform name="Vocal" wav={data.wav.vocal} />
-        <Waveform name="Other" wav={data.wav.other} />
+        <Waveform index={0} name="Drum" wav={data.wav.drum} />
+        <Waveform index={1} name="Bass" wav={data.wav.bass} />
+        <Waveform index={2} name="Vocal" wav={data.wav.vocal} />
+        <Waveform index={3} name="Other" wav={data.wav.other} />
       </div>
       <div class="absolute w-full h-96">
         <WaveformGrid
