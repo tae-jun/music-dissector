@@ -52,7 +52,6 @@
     if (scene)
       scene.traverse((obj) => {
         if (obj instanceof THREE.Mesh) {
-          console.log(obj)
           obj.geometry.dispose()
           obj.material.dispose()
         }

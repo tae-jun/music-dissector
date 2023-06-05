@@ -1,6 +1,9 @@
 <script lang="ts">
   import { goto } from '$app/navigation'
   import tracks from '$lib/tracks'
+  import { onMount } from 'svelte'
 
-  goto(`${tracks[0]}`)
+  onMount(async () => {
+    await goto(tracks[Math.floor(Math.random() * tracks.length)])
+  })
 </script>

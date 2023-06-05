@@ -8,14 +8,16 @@
   import { AppShell, AppBar } from '@skeletonlabs/skeleton'
 
   import { page } from '$app/stores'
-
   import tracks from '$lib/tracks'
-  import { goto, invalidateAll } from '$app/navigation'
+  import { afterNavigate, goto } from '$app/navigation'
 
-  let selected: string
+  let selected: string = $page.params.track
+
+  afterNavigate(() => {
+    selected = $page.params.track ?? selected
+  })
 
   async function redirect(event: Event) {
-    await invalidateAll()
     await goto(selected)
   }
 </script>

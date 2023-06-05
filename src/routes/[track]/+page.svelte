@@ -83,8 +83,9 @@
     bind:paused={$paused}
     bind:duration={$duration}
     on:loadeddata={() => {
-      console.log(audio)
       $paused = true
+      $currentTime = 0
+      console.log($paused, $currentTime, $duration)
     }}
   />
 {/if}
