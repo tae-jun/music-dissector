@@ -32,6 +32,7 @@
   })
 
   onDestroy(() => {
+    mounted = false
     dispose()
   })
 
@@ -41,7 +42,7 @@
   }
 
   function animate() {
-    if (!canvas) return
+    if (!mounted) return
     if (!$paused) requestAnimationFrame(animate)
     camera.position.x = $currentTime * FPS * hopSize
     renderer.render(scene, camera)

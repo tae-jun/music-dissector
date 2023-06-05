@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from 'svelte'
+  import { onDestroy, onMount } from 'svelte'
   import { currentTime, paused } from '$lib/stores'
   import { FPS, WINDOW_SECONDS, FRAMES_PER_WINDOW, BEAT_TOLERANCE, COLOR } from '$lib/config'
 
@@ -35,6 +35,10 @@
     draw()
   })
 
+  onDestroy(() => {
+    mounted = false
+  })
+
   function onResize() {
     setupSize()
     if ($paused) draw()
@@ -50,13 +54,12 @@
 
   function draw() {
     if (!mounted) return
+    if (!$paused) requestAnimationFrame(draw)
 
     ctx.clearRect(0, 0, width, height)
 
     drawTimebar()
     drawGrids()
-
-    if (!$paused) requestAnimationFrame(draw)
   }
 
   function drawGrids() {
@@ -92,7 +95,7 @@
     }
     ctx.stroke()
 
-    ctx.lineWidth = dpr * 1.5
+    ctx.lineWidth = dpr * 1
     for (const gridLineX of wrongGridLineXs) {
       ctx.beginPath()
       ctx.strokeStyle = 'red'
