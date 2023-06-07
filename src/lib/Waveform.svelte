@@ -1,12 +1,10 @@
 <script lang="ts">
   import * as THREE from 'three'
   import { onMount, onDestroy } from 'svelte'
-  import { paused, mutes } from '$lib/stores'
+  import { paused } from '$lib/stores'
   import { FPS, FRAMES_PER_WINDOW, COLOR } from '$lib/config'
   import { getPlaybackTime } from './AudioContext.svelte'
 
-  export let index: number
-  export let name: string
   export let wav: { [key: string]: number[] }
 
   let mounted = false
@@ -76,10 +74,10 @@
 
     renderer = new THREE.WebGLRenderer({
       antialias: true,
+      alpha: true,
       canvas,
     })
     renderer.setPixelRatio(dpr)
-    renderer.setClearColor(COLOR.WAV_BACKGROUND, 1)
 
     drawWave(wav.low, COLOR.WAV_LOW, COLOR.WAV_LOW_OPACITY)
     drawWave(wav.mid, COLOR.WAV_MID, COLOR.WAV_MID_OPACITY)
@@ -103,7 +101,7 @@
     const material = new THREE.MeshBasicMaterial({
       color,
       opacity,
-      transparent: true,
+      transparent: opacity < 1,
       side: THREE.DoubleSide,
       depthWrite: false,
     })
@@ -114,27 +112,11 @@
     scene.add(meshUpper)
     scene.add(meshLower)
   }
-
-  function onClickSoloButton(index: number) {
-    $mutes[index] = !$mutes[index]
-  }
 </script>
 
 <div class="w-full h-24 flex">
   <div class="relative grow h-full">
     <canvas class="h-full w-full" bind:this={canvas} />
-  </div>
-  <div class="w-20 h-full z-20">
-    {name}
-    <button
-      type="button"
-      class="btn"
-      class:variant-filled-primary={!$mutes[index]}
-      class:variant-ghost-primary={$mutes[index]}
-      on:click={() => onClickSoloButton(index)}
-    >
-      S
-    </button>
   </div>
 </div>
 
@@ -142,6 +124,6 @@
 
 <style>
   canvas {
-    background-color: #0f0020;
+    @apply bg-surface-900;
   }
 </style>

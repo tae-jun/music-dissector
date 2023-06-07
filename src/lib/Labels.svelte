@@ -1,91 +1,104 @@
 <script lang="ts">
   import { onMount } from 'svelte'
-  import { paused } from '$lib/stores'
+  import { duration, paused } from '$lib/stores'
   import { seekTo } from './AudioContext.svelte'
 
-  export let name: string
   export let upper: boolean = false
   export let labels: string[]
   export let boundaries: number[]
 
+  let mounted: boolean = false
   let texts: string[] = []
   let positions: number[] = []
   let div: HTMLDivElement
 
-  // Exclude labels and boundaries if the label is 'start' or 'end'
-  const filteredLabels = labels.filter((label) => label !== 'start' && label !== 'end')
-  boundaries = boundaries.filter((_, i) => {
-    const label = labels[i]
-    return label !== 'start' && label !== 'end'
-  })
-  labels = filteredLabels
+  let filteredLabels: string[] = []
+  let filteredBoundaries: number[] = []
+
+  $: $duration, render()
 
   onMount(() => {
-    texts = labels.map((label) => label.charAt(0).toUpperCase() + label.slice(1))
-    onResize()
+    mounted = true
+    render()
   })
 
-  function onResize() {
+  function render() {
+    if (!mounted) return
+
+    // Filter out labels and boundaries that are invalid or out of range.
+    filteredLabels = labels.filter(
+      (label, i) =>
+        label !== 'start' &&
+        label !== 'end' &&
+        boundaries[i] >= 0 &&
+        boundaries[i] < $duration - 0.6,
+    )
+    filteredBoundaries = boundaries.filter(
+      (boundary, i) =>
+        labels[i] !== 'start' && labels[i] !== 'end' && boundary >= 0 && boundary < $duration - 0.6,
+    )
+    console.log(filteredBoundaries)
+
     const rect = div.getBoundingClientRect()
     const witdh = rect.width
-    const duration = boundaries[boundaries.length - 1]
-    positions = boundaries.map((boundary) => Math.round((boundary / duration) * witdh))
+    texts = filteredLabels.map((label) => label.charAt(0).toUpperCase() + label.slice(1))
+    positions = filteredBoundaries.map((boundary) => Math.round((boundary / $duration) * witdh))
   }
 
-  function onClick(i: number) {
+  function seekToBoundary(i: number) {
     console.log(i)
-    seekTo(boundaries[i])
+    seekTo(filteredBoundaries[i])
     if ($paused) $paused = false
   }
 </script>
 
-<div class="w-full h-[1.2rem] flex">
-  <div class="relative grow h-full" bind:this={div}>
-    {#each texts as text, i}
-      <!-- svelte-ignore a11y-click-events-have-key-events -->
-      <div
-        class="labelbox flex flex-row"
-        style:left={positions[i] + 'px'}
-        on:click={() => onClick(i)}
-      >
-        <div class="labelbox-body">{text}</div>
-        {#if upper}
-          <div class="labelbox-tail-upper" />
-        {:else}
-          <div class="labelbox-tail-lower" />
-        {/if}
+<div class="h-6 relative" bind:this={div}>
+  {#each texts as text, i}
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <div
+      class="labelbox absolute flex flex-row h-full"
+      style:left={positions[i] + 'px'}
+      on:click={() => seekToBoundary(i)}
+    >
+      <div class="labelbox-body h-full pl-1 flex items-center justify-center">
+        <span>{text}</span>
       </div>
-    {/each}
-  </div>
-  <div class="w-20 h-full z-10">{name}</div>
+      {#if upper}
+        <div class="labelbox-tail-upper h-full" />
+      {:else}
+        <div class="labelbox-tail-lower h-full" />
+      {/if}
+    </div>
+  {/each}
 </div>
 
-<svelte:window on:resize={onResize} />
+<svelte:window on:resize={render} />
 
 <style>
-  .labelbox {
-    @apply absolute;
+  :root {
+    --label-color: rgb(var(--color-surface-600));
+  }
 
+  .labelbox {
     cursor: pointer;
     transition: 100ms ease-in-out;
   }
   .labelbox:hover {
+    /* --label-color: rgb(var(--color-warning-600)); */
     filter: brightness(150%);
   }
   .labelbox-body {
     font-size: 1rem;
     line-height: 1rem;
-    padding-left: 0.2rem;
-    padding-right: 0.2rem;
-    padding-top: 0.07rem;
-    background-color: green;
+    background-color: var(--label-color);
+    border-left: 1px solid rgb(var(--color-surface-800));
   }
   .labelbox-tail-upper {
-    border-bottom: 1.2rem solid green;
-    border-right: 1.2rem solid transparent;
+    border-bottom: 1.5rem solid var(--label-color);
+    border-right: 1.5rem solid transparent;
   }
   .labelbox-tail-lower {
-    border-top: 1.2rem solid green;
-    border-right: 1.2rem solid transparent;
+    border-top: 1.5rem solid var(--label-color);
+    border-right: 1.5rem solid transparent;
   }
 </style>

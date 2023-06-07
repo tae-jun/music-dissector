@@ -1,13 +1,10 @@
 <script lang="ts">
-  import { onMount, onDestroy } from 'svelte'
+  import { onMount } from 'svelte'
   import { duration, paused } from '$lib/stores'
   import { getPlaybackTime, seekTo } from './AudioContext.svelte'
+  import { COLOR } from './config'
 
-  export let name: string
   export let energy: { [key: string]: Array<number> }
-  export let colorLow: string = 'MediumBlue'
-  export let colorMid: string = 'Orange'
-  export let colorHigh: string = 'Snow'
 
   let width: number
   let height: number
@@ -32,9 +29,9 @@
     width = energyCanvas.width = rect.width * dpr
     height = energyCanvas.height = rect.height * dpr
 
-    drawEnergy(energy.high, colorHigh)
-    drawEnergy(energy.mid, colorMid)
-    drawEnergy(energy.low, colorLow)
+    drawEnergy(energy.high, COLOR.WAV_HIGH)
+    drawEnergy(energy.mid, COLOR.WAV_MID)
+    drawEnergy(energy.low, COLOR.WAV_LOW)
   }
 
   function drawEnergy(eg: Array<number>, color: string) {
@@ -88,18 +85,15 @@
   }
 </script>
 
-<div class="w-full h-8 flex">
-  <div class="relative grow h-full">
-    <canvas id="energy" class="absolute h-full w-full" bind:this={energyCanvas} />
-    <canvas class="absolute h-full w-full" bind:this={timebarCanvas} on:mousedown={seek} />
-  </div>
-  <div class="w-20 h-full">{name}</div>
+<div class="relative h-8">
+  <canvas id="energy-canvas" class="absolute h-full w-full" bind:this={energyCanvas} />
+  <canvas class="absolute h-full w-full" bind:this={timebarCanvas} on:mousedown={seek} />
 </div>
 
 <svelte:window on:resize={draw} />
 
 <style>
-  #energy {
-    background-color: #0f0020;
+  #energy-canvas {
+    @apply bg-surface-900;
   }
 </style>
