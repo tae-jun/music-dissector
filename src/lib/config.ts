@@ -20,7 +20,7 @@ export const COLOR = {
   WAV_LOW_OPACITY: 1.0,
   WAV_MID_OPACITY: 1.0,
   WAV_HIGH_OPACITY: 0.5,
-  BEAT_CORRECT: getCssVarColorAsHex('--color-primary-500'),
+  BEAT_CORRECT: getCssVarColorAsHex('--color-success-500'),
   BEAT_WRONG: getCssVarColorAsHex('--color-error-500'),
 }
 

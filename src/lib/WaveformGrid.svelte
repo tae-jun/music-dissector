@@ -64,8 +64,8 @@
   }
 
   function drawGrids() {
-    drawGrid(beats, '#666', true)
-    drawGrid(downbeats, '#AAA')
+    drawGrid(beats, '#BBB', true)
+    drawGrid(downbeats, '#BBB')
   }
 
   function drawGrid(gridLines: GridLine[], color: string, dottedLine: boolean = false) {
@@ -86,7 +86,7 @@
     const wrongGridLineXs = wrongGridLines.map((t) => [timeToX(t.pred), timeToX(t.true)])
 
     ctx.save()
-    ctx.lineWidth = dpr * 1
+    ctx.lineWidth = dpr * 1.5
     if (dottedLine) ctx.setLineDash([5, 5])
 
     ctx.strokeStyle = color
@@ -97,16 +97,18 @@
     }
     ctx.stroke()
 
-    ctx.lineWidth = dpr * 1
+    ctx.lineWidth = dpr * 1.5
     for (const gridLineX of wrongGridLineXs) {
       ctx.beginPath()
-      ctx.strokeStyle = COLOR.BEAT_CORRECT
+      // ctx.strokeStyle = COLOR.BEAT_CORRECT
+      ctx.strokeStyle = '#00FF00'
       ctx.moveTo(gridLineX[0], 0)
       ctx.lineTo(gridLineX[0], height)
       ctx.stroke()
 
       ctx.beginPath()
-      ctx.strokeStyle = COLOR.BEAT_WRONG
+      // ctx.strokeStyle = COLOR.BEAT_WRONG
+      ctx.strokeStyle = '#FF0000'
       ctx.moveTo(gridLineX[1], 0)
       ctx.lineTo(gridLineX[1], height)
       ctx.stroke()
