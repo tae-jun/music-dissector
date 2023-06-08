@@ -29,9 +29,9 @@
     width = energyCanvas.width = rect.width * dpr
     height = energyCanvas.height = rect.height * dpr
 
-    drawEnergy(energy.high, COLOR.WAV_HIGH)
-    drawEnergy(energy.mid, COLOR.WAV_MID)
-    drawEnergy(energy.low, COLOR.WAV_LOW)
+    drawEnergy(energy.high, COLOR.NAV_HIGH)
+    drawEnergy(energy.mid, COLOR.NAV_MID)
+    drawEnergy(energy.low, COLOR.NAV_LOW)
   }
 
   function drawEnergy(eg: Array<number>, color: string) {

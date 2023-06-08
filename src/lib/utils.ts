@@ -1,7 +1,7 @@
 import { browser } from "$app/environment"
 
-export function getCssVarColorAsHex(cssVar: string) {
-    if (!browser) return
+export function getCssVarColorAsHex(cssVar: string): string {
+    if (!browser) return ''
 
     // Get CSS Variable
     let rootStyle = getComputedStyle(document.documentElement)

@@ -26,7 +26,7 @@
   </div>
 {:else}
   {#key $page.params.track}
-    <div class="grid grid-cols-[auto_5rem] divide-y my-1">
+    <div class="grid grid-cols-[auto_5rem] divide-y my-2">
       <div>
         <Labels upper labels={data.truths.labels} boundaries={data.truths.segments} />
       </div>
@@ -48,13 +48,14 @@
         <Labels labels={data.inferences.labels} boundaries={data.inferences.segments} />
       </div>
       <div class="navigator-label">AI</div>
+    </div>
 
-      <div class="h-2" style="border: none" />
-      <div class="h-2" style="border: none" />
-
+    <div class="grid grid-cols-[auto_5rem] divide-y my-2">
       <!-- Waveforms -->
-      <div><Waveform wav={data.wav.drum} /></div>
-      <div>
+      <div style="border-top-width: 2px">
+        <Waveform wav={data.wav.drum} />
+      </div>
+      <div style="border-top-width: 2px">
         <WaveformTitle index={0} title="Drum" />
       </div>
 
@@ -68,10 +69,16 @@
         <WaveformTitle index={2} title="Vocal" />
       </div>
 
-      <div style="border-bottom-width: 1px">
+      <div style="border-bottom-width: 2px">
         <Waveform wav={data.wav.other} />
+        <!-- <WaveformGrid
+          predBeats={data.inferences.beats}
+          predDownbeats={data.inferences.downbeats}
+          trueBeats={data.truths.beats}
+          trueDownbeats={data.truths.downbeats}
+        /> -->
       </div>
-      <div style="border-bottom-width: 1px">
+      <div style="border-bottom-width: 2px">
         <WaveformTitle index={3} title="Other" />
       </div>
     </div>

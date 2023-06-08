@@ -160,7 +160,6 @@
   <div class="relative grow h-full">
     <canvas class="h-full w-full" bind:this={canvas} />
   </div>
-  <div class="w-20 h-full" />
 </div>
 
 <svelte:window on:resize={onResize} />
