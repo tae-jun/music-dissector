@@ -100,13 +100,13 @@
     ctx.lineWidth = dpr * 1
     for (const gridLineX of wrongGridLineXs) {
       ctx.beginPath()
-      ctx.strokeStyle = 'red'
+      ctx.strokeStyle = COLOR.BEAT_CORRECT
       ctx.moveTo(gridLineX[0], 0)
       ctx.lineTo(gridLineX[0], height)
       ctx.stroke()
 
       ctx.beginPath()
-      ctx.strokeStyle = 'green'
+      ctx.strokeStyle = COLOR.BEAT_WRONG
       ctx.moveTo(gridLineX[1], 0)
       ctx.lineTo(gridLineX[1], height)
       ctx.stroke()

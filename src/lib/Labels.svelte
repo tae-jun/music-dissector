@@ -37,7 +37,6 @@
       (boundary, i) =>
         labels[i] !== 'start' && labels[i] !== 'end' && boundary >= 0 && boundary < $duration - 0.6,
     )
-    console.log(filteredBoundaries)
 
     const rect = div.getBoundingClientRect()
     const witdh = rect.width
@@ -46,7 +45,6 @@
   }
 
   function seekToBoundary(i: number) {
-    console.log(i)
     seekTo(filteredBoundaries[i])
     if ($paused) $paused = false
   }

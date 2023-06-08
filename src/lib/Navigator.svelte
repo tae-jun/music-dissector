@@ -77,7 +77,6 @@
   }
 
   function seek(event: MouseEvent) {
-    console.log(event)
     $paused = false
 
     const rect = energyCanvas.getBoundingClientRect()

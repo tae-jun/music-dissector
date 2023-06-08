@@ -20,6 +20,8 @@ export const COLOR = {
   WAV_LOW_OPACITY: 1.0,
   WAV_MID_OPACITY: 1.0,
   WAV_HIGH_OPACITY: 0.5,
+  BEAT_CORRECT: getCssVarColorAsHex('--color-primary-500'),
+  BEAT_WRONG: getCssVarColorAsHex('--color-error-500'),
 }
 
 export const BASE_AUDIO_URL = 'https://taejun-allinone-demo.s3.ap-northeast-2.amazonaws.com'
