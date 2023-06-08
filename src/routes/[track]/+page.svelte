@@ -99,7 +99,7 @@
       <div class="px-2">
         <button
           type="button"
-          class="btn btn-sm h-7 w-10 variant-ghost-secondary"
+          class="btn btn-sm h-7 w-10 variant-ghost-primary"
           on:click={() => ($paused = !$paused)}
         >
           {#if $paused}
@@ -118,11 +118,11 @@
         <button
           type="button"
           class="btn btn-sm w-10 h-7"
-          class:variant-ghost-secondary={$mutes.some((m) => m)}
-          class:variant-soft-secondary={!$mutes.some((m) => m)}
+          class:variant-ghost-primary={$mutes.some((m) => m)}
+          class:variant-soft-primary={!$mutes.some((m) => m)}
           on:click={() => ($mutes = $mutes.map((m) => false))}
         >
-          <span class="text-secondary-500 text-lg">
+          <span class="text-primary-500 text-lg">
             <Icon icon="carbon:reset-alt" />
           </span>
         </button>

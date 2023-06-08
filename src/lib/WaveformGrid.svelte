@@ -70,7 +70,7 @@
 
   function drawGrid(gridLines: GridLine[], color: string, dottedLine: boolean = false) {
     const playbackTime = getPlaybackTime()
-    const centerFrame = Math.round(playbackTime * FPS)
+    const centerFrame = playbackTime * FPS
     const centerX = centerFrame * hopSize
     const start = playbackTime - WINDOW_SECONDS / 2
     const end = playbackTime + WINDOW_SECONDS / 2
@@ -81,7 +81,7 @@
     const correctGridLines = windowGridLines.filter((t) => !t.wrong)
     const wrongGridLines = windowGridLines.filter((t) => t.wrong)
 
-    const timeToX = (t: number) => Math.round(t * FPS * hopSize - centerX + width / 2)
+    const timeToX = (t: number) => t * FPS * hopSize - centerX + width / 2
     const correctGridLineXs = correctGridLines.map((t) => timeToX(t.pred))
     const wrongGridLineXs = wrongGridLines.map((t) => [timeToX(t.pred), timeToX(t.true)])
 

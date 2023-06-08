@@ -14,7 +14,7 @@
   import tracks from '$lib/tracks'
   import { afterNavigate, goto } from '$app/navigation'
 
-  let selected: string = $page.params.track
+  let selected: string
 
   afterNavigate(() => {
     selected = $page.params.track ?? selected

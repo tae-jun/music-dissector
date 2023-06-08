@@ -1,7 +1,7 @@
 <script context="module" lang="ts">
   import { browser } from '$app/environment'
   import { get } from 'svelte/store'
-  import { paused, duration, mutes } from '$lib/stores'
+  import { paused, duration, mutes, loading } from '$lib/stores'
   import { BASE_AUDIO_URL } from './config'
   import { onDestroy, onMount } from 'svelte'
 
@@ -54,6 +54,7 @@
   }
 
   async function loadAudioFiles(urls: string[]) {
+    loading.set(true)
     // If there are any currently playing audio sources, stop them and disconnect
     destroySources()
 
@@ -65,6 +66,7 @@
     offsetTime = 0
     paused.set(true)
     duration.set(audioBuffers[0].duration)
+    loading.set(false)
   }
 
   async function loadTrackAudioFiles(trackId: string) {

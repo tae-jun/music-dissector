@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte'
-  import { duration, paused } from '$lib/stores'
+  import { duration, loading, paused } from '$lib/stores'
   import { seekTo } from './AudioContext.svelte'
 
   export let upper: boolean = false
@@ -15,7 +15,7 @@
   let filteredLabels: string[] = []
   let filteredBoundaries: number[] = []
 
-  $: $duration, render()
+  $: if (!$loading) render()
 
   onMount(() => {
     mounted = true
@@ -89,7 +89,7 @@
     font-size: 1rem;
     line-height: 1rem;
     background-color: var(--label-color);
-    border-left: 1px solid rgb(var(--color-surface-800));
+    border-left: 1px solid rgb(var(--color-surface-900));
   }
   .labelbox-tail-upper {
     border-bottom: 1.5rem solid var(--label-color);

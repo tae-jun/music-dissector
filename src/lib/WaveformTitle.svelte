@@ -15,11 +15,11 @@
   <button
     type="button"
     class="btn btn-sm mb-1 w-10 h-10"
-    class:variant-ghost-secondary={!$mutes[index]}
-    class:variant-soft-secondary={$mutes[index]}
+    class:variant-ghost-primary={!$mutes[index]}
+    class:variant-soft-primary={$mutes[index]}
     on:click={() => onClickButton(index)}
   >
-    <span class="text-secondary-500 text-lg">
+    <span class="text-primary-500 text-lg">
       {#if $mutes[index]}
         <Icon icon="ph:x" />
       {:else}

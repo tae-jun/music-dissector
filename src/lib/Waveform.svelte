@@ -27,7 +27,7 @@
     dpr = window.devicePixelRatio || 1
     mounted = true
 
-    resize()
+    resizeAndDraw()
     animate()
   })
 
@@ -37,7 +37,7 @@
   })
 
   function onResize() {
-    resize()
+    resizeAndDraw()
     if (!$paused) animate()
   }
 
@@ -59,7 +59,7 @@
       })
   }
 
-  function resize() {
+  function resizeAndDraw() {
     dispose()
 
     const rect = canvas.getBoundingClientRect()
