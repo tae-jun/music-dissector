@@ -79,10 +79,9 @@
 
   .labelbox {
     cursor: pointer;
-    transition: 100ms ease-in-out;
+    transition: filter 100ms ease-in-out;
   }
   .labelbox:hover {
-    /* --label-color: rgb(var(--color-warning-600)); */
     filter: brightness(150%);
   }
   .labelbox-body {

@@ -11,8 +11,10 @@
   import { AppShell, AppBar } from '@skeletonlabs/skeleton'
 
   import { page } from '$app/stores'
+  import { loading } from '$lib/stores'
   import tracks from '$lib/tracks'
   import { afterNavigate, goto } from '$app/navigation'
+  import Spinner from '$lib/Spinner.svelte'
 
   let selected: string
 
@@ -21,6 +23,7 @@
   })
 
   async function redirect(event: Event) {
+    $loading = true
     await goto(selected)
   }
 </script>
@@ -63,5 +66,6 @@
     </AppBar>
   </svelte:fragment>
   <!-- Page Route Content -->
+  <Spinner />
   <slot />
 </AppShell>

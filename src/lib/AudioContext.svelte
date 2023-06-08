@@ -36,19 +36,7 @@
   }
 
   async function loadAudioBuffer(url: string): Promise<AudioBuffer> {
-    const cacheName = 'audio-cache'
-    const cacheKey = url
-
-    // Check if response is in cache
-    const cache = await caches.open(cacheName)
-    let response = await cache.match(cacheKey)
-
-    if (!response) {
-      // Fetch response and cache it
-      response = await fetch(url)
-      await cache.put(cacheKey, response.clone())
-    }
-
+    const response = await fetch(url, { cache: 'force-cache' })
     const arrayBuffer = await response.arrayBuffer()
     return await audioCtx.decodeAudioData(arrayBuffer)
   }
@@ -62,7 +50,7 @@
     audioBuffers = await Promise.all(urls.map(loadAudioBuffer))
 
     // Reset timing variables
-    startTime = 0
+    startTime = audioCtx.currentTime
     offsetTime = 0
     paused.set(true)
     duration.set(audioBuffers[0].duration)

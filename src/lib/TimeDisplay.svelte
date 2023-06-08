@@ -20,4 +20,4 @@
   }
 </script>
 
-{time} / {formatTime($duration)}
+<span class="font-mono">{time} / {formatTime($duration)}</span>
