@@ -11,6 +11,7 @@
   import { AppShell, AppBar } from '@skeletonlabs/skeleton'
 
   import { page } from '$app/stores'
+  import { base } from '$app/paths'
   import { loading } from '$lib/stores'
   import tracks from '$lib/tracks'
   import { afterNavigate, goto } from '$app/navigation'
@@ -24,7 +25,8 @@
 
   async function redirect(event: Event) {
     $loading = true
-    await goto(selected)
+
+    await goto(`${base}/${selected}`)
   }
 </script>
 
