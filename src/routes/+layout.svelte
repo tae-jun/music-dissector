@@ -36,7 +36,7 @@
     <!-- App Bar -->
     <AppBar gridColumns="grid-cols-3" slotDefault="place-self-center" slotTrail="place-content-end">
       <svelte:fragment slot="lead">
-        <a href="/">
+        <a href={base || '/'}>
           <strong class="text-xl"> Music Dissector </strong>
         </a>
       </svelte:fragment>
