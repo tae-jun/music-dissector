@@ -1,7 +1,5 @@
 import { browser } from '$app/environment'
 
-export const ssr = false
-
 export async function load({ fetch, params }) {
   if (!browser) return
 
