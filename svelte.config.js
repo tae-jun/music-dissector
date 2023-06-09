@@ -12,7 +12,10 @@ const config = {
 	kit: {
 		adapter: adapter({
 			fallback: 'index.html',
-		})
+		}),
+		paths: {
+			base: dev ? '' : process.env.BASE_PATH,
+		}
 	}
 }
 export default config
