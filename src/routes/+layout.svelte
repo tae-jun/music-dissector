@@ -32,12 +32,7 @@
 <AppShell>
   <svelte:fragment slot="header">
     <!-- App Bar -->
-    <AppBar
-      padding="px-4 py-2"
-      gridColumns="grid-cols-3"
-      slotDefault="place-self-center"
-      slotTrail="place-content-end"
-    >
+    <AppBar gridColumns="grid-cols-3" slotDefault="place-self-center" slotTrail="place-content-end">
       <svelte:fragment slot="lead">
         <a href="/">
           <strong class="text-xl"> Music Dissector </strong>
