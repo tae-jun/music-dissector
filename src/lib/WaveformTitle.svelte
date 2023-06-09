@@ -10,7 +10,7 @@
   }
 </script>
 
-<div class="flex flex-col h-full p-2 items-start justify-center">
+<div class="flex flex-col h-full py-2 items-start justify-center">
   <div class="mb-1"><span class="text-xl font-bold">{title}</span></div>
   <button
     type="button"

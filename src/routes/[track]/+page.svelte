@@ -26,59 +26,70 @@
 {#key $page.params.track}
   <AudioContext trackId={$page.params.track} />
 
-  <div class="grid grid-cols-[auto_5rem] divide-y my-2">
-    <div>
-      <Labels upper labels={data.truths.labels} boundaries={data.truths.segments} />
+  <div class="grid grid-cols-[6rem_auto] divide-y my-2">
+    <div class="flex flex-row">
+      <div class="navigator-label w-[4.5rem] flex items-center justify-center bg-primary-600">
+        <span class="text-black">Human</span>
+      </div>
+      <div class="navigator-label-triangle-top" />
     </div>
-    <div class="navigator-label" style="border: none">Human</div>
+    <div style="border: none">
+      <Labels top labels={data.truths.labels} boundaries={data.truths.segments} />
+    </div>
 
-    <div><Navigator energy={data.nav.drum} /></div>
     <div class="navigator-label">Drum</div>
+    <div><Navigator energy={data.nav.drum} /></div>
 
-    <div><Navigator energy={data.nav.bass} /></div>
     <div class="navigator-label">Bass</div>
+    <div><Navigator energy={data.nav.bass} /></div>
 
-    <div><Navigator energy={data.nav.vocal} /></div>
     <div class="navigator-label">Vocal</div>
+    <div><Navigator energy={data.nav.vocal} /></div>
 
-    <div><Navigator energy={data.nav.other} /></div>
     <div class="navigator-label">Other</div>
+    <div><Navigator energy={data.nav.other} /></div>
 
+    <div class="flex flex-row">
+      <div class="navigator-label w-[4.5rem] flex items-center justify-center bg-primary-600">
+        <span class="text-black pr-2">AI</span>
+      </div>
+      <div class="navigator-label-triangle-bottom" />
+    </div>
     <div>
       <Labels labels={data.inferences.labels} boundaries={data.inferences.segments} />
     </div>
-    <div class="navigator-label">AI</div>
   </div>
 
   <div class="relative my-2" style="height: calc(24rem + 7px);">
-    <div class="absolute w-full grid grid-cols-[auto_5rem] divide-y">
+    <div class="absolute w-full grid grid-cols-[6rem_auto] divide-y">
       <!-- Waveforms -->
+      <div class="z-10 pl-2" style="border-top-width: 2px">
+        <WaveformTitle index={0} title="Drum" />
+      </div>
       <div style="border-top-width: 2px">
         <Waveform wav={data.wav.drum} />
       </div>
-      <div class="z-10" style="border-top-width: 2px">
-        <WaveformTitle index={0} title="Drum" />
-      </div>
 
-      <div><Waveform wav={data.wav.bass} /></div>
-      <div class="z-10">
+      <div class="z-10 pl-2">
         <WaveformTitle index={1} title="Bass" />
       </div>
+      <div><Waveform wav={data.wav.bass} /></div>
 
-      <div><Waveform wav={data.wav.vocal} /></div>
-      <div class="z-10">
+      <div class="z-10 pl-2">
         <WaveformTitle index={2} title="Vocal" />
       </div>
+      <div><Waveform wav={data.wav.vocal} /></div>
 
+      <div class="z-10 pl-2" style="border-bottom-width: 2px">
+        <WaveformTitle index={3} title="Other" />
+      </div>
       <div style="border-bottom-width: 2px">
         <Waveform wav={data.wav.other} />
       </div>
-      <div class="z-10" style="border-bottom-width: 2px">
-        <WaveformTitle index={3} title="Other" />
-      </div>
     </div>
 
-    <div class="absolute w-full grid grid-cols-[auto_5rem]">
+    <div class="absolute w-full grid grid-cols-[6rem_auto]">
+      <div />
       <div class="w-full" style="height: calc(24rem + 7px);">
         <WaveformGrid
           predBeats={data.inferences.beats}
@@ -92,6 +103,22 @@
 
   <!-- Bottom Bar -->
   <div class="flex flex-row items-center justify-start">
+    <div class="px-2" style="width: 6rem;">
+      <button
+        type="button"
+        class="btn btn-sm w-10 h-7"
+        class:variant-ghost-primary={$mutes.some((m) => m)}
+        class:variant-soft-primary={!$mutes.some((m) => m)}
+        on:click={() => ($mutes = $mutes.map((m) => false))}
+      >
+        <span class="text-primary-500 text-lg">
+          <Icon icon="carbon:reset-alt" />
+        </span>
+      </button>
+    </div>
+
+    <div class="grow" />
+
     <div class="px-2">
       <button
         type="button"
@@ -105,24 +132,9 @@
         {/if}
       </button>
     </div>
-
-    <div class="grow" />
-
     <div class="px-1"><TimeDisplay /></div>
 
-    <div class="px-2" style="width: 5rem;">
-      <button
-        type="button"
-        class="btn btn-sm w-10 h-7"
-        class:variant-ghost-primary={$mutes.some((m) => m)}
-        class:variant-soft-primary={!$mutes.some((m) => m)}
-        on:click={() => ($mutes = $mutes.map((m) => false))}
-      >
-        <span class="text-primary-500 text-lg">
-          <Icon icon="carbon:reset-alt" />
-        </span>
-      </button>
-    </div>
+    <div class="grow" />
   </div>
 
   <div class="flex flex-row">
@@ -169,9 +181,16 @@
 
 <style>
   .navigator-label {
-    @apply flex items-center justify-start h-full pl-1 font-bold;
+    @apply flex items-center justify-start pl-2 font-bold;
   }
-
+  .navigator-label-triangle-top {
+    border-bottom: 1.5rem solid rgb(var(--color-primary-600));
+    border-right: 1.5rem solid transparent;
+  }
+  .navigator-label-triangle-bottom {
+    border-top: 1.5rem solid rgb(var(--color-primary-600));
+    border-right: 1.5rem solid transparent;
+  }
   div {
     @apply border-surface-600;
   }

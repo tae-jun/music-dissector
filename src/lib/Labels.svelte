@@ -3,7 +3,7 @@
   import { duration, loading, paused } from '$lib/stores'
   import { seekTo } from './AudioContext.svelte'
 
-  export let upper: boolean = false
+  export let top: boolean = false
   export let labels: string[]
   export let boundaries: number[]
 
@@ -58,13 +58,13 @@
       style:left={positions[i] + 'px'}
       on:click={() => seekToBoundary(i)}
     >
-      <div class="labelbox-body h-full pl-1 flex items-center justify-center">
+      <div class="labelbox-body pl-1 flex items-center justify-center">
         <span>{text}</span>
       </div>
-      {#if upper}
-        <div class="labelbox-tail-upper h-full" />
+      {#if top}
+        <div class="labelbox-tail-upper" />
       {:else}
-        <div class="labelbox-tail-lower h-full" />
+        <div class="labelbox-tail-lower" />
       {/if}
     </div>
   {/each}
