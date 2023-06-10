@@ -10,6 +10,8 @@
   import AudioContext from '$lib/AudioContext.svelte'
   import TimeDisplay from '$lib/TimeDisplay.svelte'
   import WaveformTitle from '$lib/WaveformTitle.svelte'
+  import WrongBeats from '$lib/WrongBeats.svelte'
+  import { excludeDownbeats } from '$lib/utils'
 
   export let data
 
@@ -48,6 +50,24 @@
 
     <div class="navigator-label">Other</div>
     <div><Navigator energy={data.nav.other} /></div>
+
+    <div />
+    <div class="w-full h-1.5">
+      {#if data.scores.downbeat.f1 == 1.0}
+        <div class="bg-secondary-700 w-full h-full" />
+      {:else}
+        <WrongBeats preds={data.inferences.downbeats} trues={data.truths.downbeats} />
+      {/if}
+    </div>
+
+    <div />
+    <div class="w-full h-1.5">
+      {#if data.scores.beat.f1 == 1.0}
+        <div class="bg-secondary-700 w-full h-full" />
+      {:else}
+        <WrongBeats preds={data.inferences.beats} trues={data.truths.beats} />
+      {/if}
+    </div>
 
     <div class="flex flex-row">
       <div class="navigator-label w-[4.5rem] flex items-center justify-center bg-primary-600">

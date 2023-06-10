@@ -15,7 +15,7 @@
   }
 
   function animate() {
-    requestAnimationFrame(animate)
+    if (!$paused) requestAnimationFrame(animate)
     time = formatTime(getPlaybackTime())
   }
 </script>

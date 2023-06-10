@@ -1,8 +1,9 @@
 <script lang="ts">
   import { onDestroy, onMount } from 'svelte'
   import { paused } from '$lib/stores'
-  import { FPS, WINDOW_SECONDS, FRAMES_PER_WINDOW, BEAT_TOLERANCE, COLOR } from '$lib/config'
+  import { FPS, WINDOW_SECONDS, FRAMES_PER_WINDOW, BEAT_TOLERANCE } from '$lib/config'
   import { getPlaybackTime } from './AudioContext.svelte'
+  import { excludeDownbeats, processGridLine, type GridLine } from '$lib/utils'
 
   export let predBeats: number[]
   export let predDownbeats: number[]
@@ -12,17 +13,35 @@
   let mounted = false
   let canvas: HTMLCanvasElement
   let ctx: CanvasRenderingContext2D
-
   let width: number
   let height: number
   let dpr: number
   let hopSize: number
 
-  predBeats = excludeDownbeats(predBeats, predDownbeats)
-  trueBeats = excludeDownbeats(trueBeats, trueDownbeats)
+  // predBeats = excludeDownbeats(predBeats, predDownbeats)
+  // trueBeats = excludeDownbeats(trueBeats, trueDownbeats)
 
-  const beats: GridLine[] = processGridLine(predBeats, trueBeats)
+  let beats: GridLine[] = processGridLine(predBeats, trueBeats)
   const downbeats: GridLine[] = processGridLine(predDownbeats, trueDownbeats)
+
+  console.log('numBeats', beats.length, 'numDownbeats', downbeats.length)
+  beats = beats.filter(({ pred: predBeat }) => {
+    const predDiffs = downbeats.map(({ pred: predDownbeat }) => Math.abs(predDownbeat - predBeat))
+    const trueDiffs = downbeats.map(({ true: trueDownbeat }) => Math.abs(trueDownbeat - predBeat))
+    const predMin = Math.min(...predDiffs)
+    const trueMin = Math.min(...trueDiffs)
+    if (predMin > BEAT_TOLERANCE && trueMin > BEAT_TOLERANCE) {
+      return true
+    } else if (trueMin <= BEAT_TOLERANCE) {
+      return false
+    } else {
+      downbeats[predDiffs.indexOf(predMin)].pred = predBeat // beat has a better precision
+      return false
+    }
+  })
+  console.log('numBeatsFiltered', beats.length, 'numDownbeats', downbeats.length)
+
+  console.log(predBeats, trueBeats, beats)
 
   $: if (!$paused) {
     draw()
@@ -64,8 +83,8 @@
   }
 
   function drawGrids() {
-    drawGrid(beats, '#BBB', true)
-    drawGrid(downbeats, '#BBB')
+    drawGrid(beats, '#FFFC', true)
+    drawGrid(downbeats, '#FFFC')
   }
 
   function drawGrid(gridLines: GridLine[], color: string, dottedLine: boolean = false) {
@@ -86,8 +105,9 @@
     const wrongGridLineXs = wrongGridLines.map((t) => [timeToX(t.pred), timeToX(t.true)])
 
     ctx.save()
-    ctx.lineWidth = dpr * 1.5
-    if (dottedLine) ctx.setLineDash([5, 5])
+    ctx.lineWidth = dpr * 1
+    const dashWidth = 4 * dpr
+    if (dottedLine) ctx.setLineDash([dashWidth, dashWidth])
 
     ctx.strokeStyle = color
     ctx.beginPath()
@@ -97,20 +117,24 @@
     }
     ctx.stroke()
 
-    ctx.lineWidth = dpr * 1.5
-    for (const gridLineX of wrongGridLineXs) {
+    for (const [predX, trueX] of wrongGridLineXs) {
+      // ctx.fillStyle = '#FF000020' // red color
+      // ctx.fillRect(Math.min(trueX, predX), 0, Math.abs(predX - trueX), height) // x, y, width, height
+
+      ctx.lineWidth = dpr * 2
       ctx.beginPath()
       // ctx.strokeStyle = COLOR.BEAT_CORRECT
-      ctx.strokeStyle = '#00FF00'
-      ctx.moveTo(gridLineX[0], 0)
-      ctx.lineTo(gridLineX[0], height)
+      ctx.strokeStyle = color
+      ctx.moveTo(trueX, 0)
+      ctx.lineTo(trueX, height)
       ctx.stroke()
 
+      ctx.lineWidth = dpr * 2
       ctx.beginPath()
       // ctx.strokeStyle = COLOR.BEAT_WRONG
-      ctx.strokeStyle = '#FF0000'
-      ctx.moveTo(gridLineX[1], 0)
-      ctx.lineTo(gridLineX[1], height)
+      ctx.strokeStyle = '#F00B'
+      ctx.moveTo(predX, 0)
+      ctx.lineTo(predX, height)
       ctx.stroke()
     }
 
@@ -128,33 +152,6 @@
     ctx.lineTo(centerX, height)
     ctx.stroke()
     ctx.restore()
-  }
-
-  // Exclude downbeats from beats.
-  function excludeDownbeats(beats: number[], downbeats: number[]): number[] {
-    return beats.filter((t) => {
-      const diffs = downbeats.map((v) => Math.abs(v - t))
-      const min = Math.min(...diffs)
-      return min > BEAT_TOLERANCE
-    })
-  }
-
-  type GridLine = {
-    pred: number
-    true: number
-    wrong: boolean
-  }
-
-  function processGridLine(preds: number[], trues: number[]): GridLine[] {
-    return preds.map((t) => {
-      const diffs = trues.map((v) => Math.abs(v - t))
-      const min = Math.min(...diffs)
-      return {
-        pred: t,
-        true: trues[diffs.indexOf(min)],
-        wrong: min > BEAT_TOLERANCE,
-      }
-    })
   }
 </script>
 
