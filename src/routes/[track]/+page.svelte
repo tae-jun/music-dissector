@@ -213,6 +213,10 @@
 
 <svelte:window on:keydown={handleKeydown} />
 
+<svelte:head>
+  <title>Music Dissector | {$page.params.track}</title>
+</svelte:head>
+
 <style>
   .navigator-label {
     @apply flex items-center justify-start pl-2 font-bold;

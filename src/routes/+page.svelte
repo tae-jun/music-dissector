@@ -12,3 +12,7 @@
     await goto(`${base}/${selected}`)
   })
 </script>
+
+<svelte:head>
+  <title>Music Dissector</title>
+</svelte:head>
