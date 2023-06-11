@@ -1,8 +1,7 @@
 <script lang="ts">
-  import { ProgressRadial } from '@skeletonlabs/skeleton'
   import Icon from '@iconify/svelte'
   import Navigator from '$lib/Navigator.svelte'
-  import { paused, mutes, loading } from '$lib/stores'
+  import { paused, mutes } from '$lib/stores'
   import Labels from '$lib/Labels.svelte'
   import Waveform from '$lib/Waveform.svelte'
   import WaveformGrid from '$lib/WaveformGrid.svelte'
@@ -11,7 +10,6 @@
   import TimeDisplay from '$lib/TimeDisplay.svelte'
   import WaveformTitle from '$lib/WaveformTitle.svelte'
   import WrongBeats from '$lib/WrongBeats.svelte'
-  import { excludeDownbeats } from '$lib/utils'
 
   export let data
 
@@ -31,25 +29,19 @@
   <div class="grid grid-cols-[6rem_auto] divide-y my-2">
     <div class="flex flex-row">
       <div class="navigator-label w-[4.5rem] flex items-center justify-center bg-primary-600">
-        <span class="text-black">Human</span>
+        <span class="text-black pr-2">AI</span>
       </div>
       <div class="navigator-label-triangle-top" />
     </div>
     <div style="border: none">
-      <Labels top labels={data.truths.labels} boundaries={data.truths.segments} />
+      <Labels
+        top
+        labels={data.inferences.labels}
+        boundaries={data.inferences.segments}
+        trueLabels={data.truths.labels}
+        trueBoundaries={data.truths.segments}
+      />
     </div>
-
-    <div class="navigator-label">Drum</div>
-    <div><Navigator energy={data.nav.drum} /></div>
-
-    <div class="navigator-label">Bass</div>
-    <div><Navigator energy={data.nav.bass} /></div>
-
-    <div class="navigator-label">Vocal</div>
-    <div><Navigator energy={data.nav.vocal} /></div>
-
-    <div class="navigator-label">Other</div>
-    <div><Navigator energy={data.nav.other} /></div>
 
     <div />
     <div class="w-full h-1.5">
@@ -69,14 +61,26 @@
       {/if}
     </div>
 
+    <div class="navigator-label">Drum</div>
+    <div><Navigator energy={data.nav.drum} /></div>
+
+    <div class="navigator-label">Bass</div>
+    <div><Navigator energy={data.nav.bass} /></div>
+
+    <div class="navigator-label">Vocal</div>
+    <div><Navigator energy={data.nav.vocal} /></div>
+
+    <div class="navigator-label">Other</div>
+    <div><Navigator energy={data.nav.other} /></div>
+
     <div class="flex flex-row">
       <div class="navigator-label w-[4.5rem] flex items-center justify-center bg-primary-600">
-        <span class="text-black pr-2">AI</span>
+        <span class="text-black">Human</span>
       </div>
       <div class="navigator-label-triangle-bottom" />
     </div>
     <div>
-      <Labels labels={data.inferences.labels} boundaries={data.inferences.segments} />
+      <Labels labels={data.truths.labels} boundaries={data.truths.segments} />
     </div>
   </div>
 

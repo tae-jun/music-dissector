@@ -2,18 +2,17 @@
   import { onMount } from 'svelte'
   import { duration, loading, paused } from '$lib/stores'
   import { seekTo } from './AudioContext.svelte'
+  import { COLOR } from './config'
 
   export let top: boolean = false
   export let labels: string[]
   export let boundaries: number[]
+  export let trueLabels: string[] = []
+  export let trueBoundaries: number[] = []
 
   let mounted: boolean = false
-  let texts: string[] = []
-  let positions: number[] = []
   let div: HTMLDivElement
-
-  let filteredLabels: string[] = []
-  let filteredBoundaries: number[] = []
+  let data: any[] = []
 
   $: if (!$loading) render()
 
@@ -25,41 +24,60 @@
   function render() {
     if (!mounted) return
 
-    // Filter out labels and boundaries that are invalid or out of range.
-    filteredLabels = labels.filter(
-      (label, i) =>
-        label !== 'start' &&
-        label !== 'end' &&
-        boundaries[i] >= 0 &&
-        boundaries[i] < $duration - 0.6,
-    )
-    filteredBoundaries = boundaries.filter(
-      (boundary, i) =>
-        labels[i] !== 'start' && labels[i] !== 'end' && boundary >= 0 && boundary < $duration - 0.6,
-    )
-
     const rect = div.getBoundingClientRect()
     const witdh = rect.width
-    texts = filteredLabels.map((label) => label.charAt(0).toUpperCase() + label.slice(1))
-    positions = filteredBoundaries.map((boundary) => Math.round((boundary / $duration) * witdh))
+
+    data = labels
+      .map((label, i) => ({ label, boundary: boundaries[i] }))
+      .filter(
+        ({ label, boundary }) =>
+          label !== 'start' && label !== 'end' && boundary >= 0 && boundary < $duration,
+      )
+      .map(({ label, boundary }) => {
+        let color = COLOR.LABEL_CORRECT
+        let textColor = 'text-white'
+        if (trueLabels.length > 0) {
+          // TODO: trueBoundaries 에서도 start, end 지워야함
+          const diffs = trueBoundaries.map((tru) => Math.abs(tru - boundary))
+          const min = Math.min(...diffs)
+          const wrongBoundary = min > 0.5
+          const wrongLabel = trueLabels[diffs.indexOf(min)] !== label
+
+          if (wrongBoundary && wrongLabel) {
+            color = COLOR.LABEL_SUPER_WRONG
+          } else if (wrongBoundary || wrongLabel) {
+            color = COLOR.LABEL_WRONG
+            textColor = 'text-black'
+          }
+        }
+
+        return {
+          text: label.charAt(0).toUpperCase() + label.slice(1),
+          position: Math.round((boundary / $duration) * witdh),
+          boundary,
+          color,
+          textColor,
+        }
+      })
   }
 
   function seekToBoundary(i: number) {
-    seekTo(filteredBoundaries[i])
+    seekTo(data[i].boundary)
     if ($paused) $paused = false
   }
 </script>
 
 <div class="h-6 relative" bind:this={div}>
-  {#each texts as text, i}
+  {#each data as x, i}
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <div
-      class="labelbox absolute flex flex-row h-full"
-      style:left={positions[i] + 'px'}
+      class="labelbox absolute flex flex-row h-full {x.textColor}"
+      style:--label-color={x.color}
+      style:left={x.position + 'px'}
       on:click={() => seekToBoundary(i)}
     >
       <div class="labelbox-body pl-1 flex items-center justify-center">
-        <span>{text}</span>
+        <span>{x.text}</span>
       </div>
       {#if top}
         <div class="labelbox-tail-upper" />
