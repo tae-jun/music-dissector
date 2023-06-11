@@ -9,7 +9,7 @@
   import AudioContext from '$lib/AudioContext.svelte'
   import TimeDisplay from '$lib/TimeDisplay.svelte'
   import WaveformTitle from '$lib/WaveformTitle.svelte'
-  import WrongBeatsNew from '$lib/WrongBeatsNew.svelte'
+  import WrongBeats from '$lib/WrongBeats.svelte'
   import SharedCanvas from '$lib/SharedCanvas.svelte'
 
   export let data
@@ -51,8 +51,8 @@
       <div />
       <div class="w-full h-1.5">
         <SharedCanvas>
-          <WrongBeatsNew preds={data.inferences.beats} trues={data.truths.beats} />
-          <WrongBeatsNew circle preds={data.inferences.downbeats} trues={data.truths.downbeats} />
+          <WrongBeats preds={data.inferences.beats} trues={data.truths.beats} />
+          <WrongBeats circle preds={data.inferences.downbeats} trues={data.truths.downbeats} />
         </SharedCanvas>
       </div>
     {/if}
