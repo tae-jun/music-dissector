@@ -1,7 +1,7 @@
 <script lang="ts">
   import * as THREE from 'three'
   import { onMount, onDestroy } from 'svelte'
-  import { paused } from '$lib/stores'
+  import { duration, paused } from '$lib/stores'
   import { FPS, FRAMES_PER_WINDOW, COLOR } from '$lib/config'
   import { getPlaybackTime } from './AudioContext.svelte'
 
@@ -19,9 +19,8 @@
   let dpr: number
   let hopSize: number
 
-  $: if (!$paused) {
-    animate()
-  }
+  $: if (!$paused) animate()
+  $: if ($duration) animate()
 
   onMount(() => {
     dpr = window.devicePixelRatio || 1

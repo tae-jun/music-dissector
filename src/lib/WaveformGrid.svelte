@@ -1,9 +1,9 @@
 <script lang="ts">
   import { onDestroy, onMount } from 'svelte'
-  import { paused } from '$lib/stores'
+  import { duration, paused } from '$lib/stores'
   import { FPS, WINDOW_SECONDS, FRAMES_PER_WINDOW, BEAT_TOLERANCE, COLOR } from '$lib/config'
   import { getPlaybackTime } from './AudioContext.svelte'
-  import { excludeDownbeats, processGridLine, type GridLine, getCssVarColorAsHex } from '$lib/utils'
+  import { processGridLine, type GridLine } from '$lib/utils'
 
   export let predBeats: number[]
   export let predDownbeats: number[]
@@ -36,9 +36,8 @@
     }
   })
 
-  $: if (!$paused) {
-    draw()
-  }
+  $: if (!$paused) draw()
+  $: if ($duration) draw()
 
   onMount(() => {
     dpr = window.devicePixelRatio || 1

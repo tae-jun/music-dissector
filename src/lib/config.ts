@@ -30,3 +30,5 @@ export const COLOR = {
 }
 
 export const BASE_AUDIO_URL = 'https://taejun-allinone-demo.s3.ap-northeast-2.amazonaws.com'
+export const BEAT_FREQUENCY = 1500
+export const DOWNBEAT_FREQUENCY = 3000

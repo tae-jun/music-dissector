@@ -63,7 +63,6 @@
 
   function seekToBoundary(i: number) {
     seekTo(data[i].boundary)
-    if ($paused) $paused = false
   }
 </script>
 

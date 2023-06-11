@@ -15,6 +15,7 @@
   let timebarCanvas: HTMLCanvasElement
 
   $: if (!$paused) drawTimebar()
+  $: if ($duration) drawTimebar()
 
   onMount(() => {
     dpr = window.devicePixelRatio || 1
@@ -77,8 +78,6 @@
   }
 
   function seek(event: MouseEvent) {
-    $paused = false
-
     const rect = energyCanvas.getBoundingClientRect()
     seekTo(($duration * event.offsetX) / rect.width)
   }

@@ -1,12 +1,24 @@
 <script lang="ts">
+  import { onDestroy, onMount } from 'svelte'
   import { getPlaybackTime } from './AudioContext.svelte'
   import { duration, paused } from './stores'
 
+  let mounted = false
+  let requestId: number
   let time: string = formatTime(getPlaybackTime())
 
   $: if (!$paused) {
     animate()
   }
+
+  onMount(() => {
+    mounted = true
+  })
+
+  onDestroy(() => {
+    mounted = false
+    cancelAnimationFrame(requestId)
+  })
 
   function formatTime(timeInSeconds: number) {
     const minutes = Math.floor(timeInSeconds / 60)
@@ -15,7 +27,8 @@
   }
 
   function animate() {
-    if (!$paused) requestAnimationFrame(animate)
+    if (!mounted) return
+    if (!$paused) requestId = requestAnimationFrame(animate)
     time = formatTime(getPlaybackTime())
   }
 </script>

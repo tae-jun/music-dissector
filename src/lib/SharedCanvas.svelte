@@ -20,9 +20,6 @@
   onMount(() => {
     dpr = window.devicePixelRatio || 1
     mounted = true
-
-    // setupSize()
-    // drawItems()
   })
 
   onDestroy(() => {
@@ -46,7 +43,6 @@
 
       setupSize()
       drawItems()
-      console.log('afterUpdate')
     })
   }
 
@@ -61,6 +57,7 @@
   }
 
   function setupSize() {
+    if (!mounted) return
     const rect = canvas.getBoundingClientRect()
     width = canvas.width = rect.width * dpr
     height = canvas.height = rect.height * dpr

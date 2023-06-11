@@ -1,7 +1,7 @@
 <script lang="ts">
   import Icon from '@iconify/svelte'
   import Navigator from '$lib/Navigator.svelte'
-  import { paused, mutes } from '$lib/stores'
+  import { paused, mutes, metronome } from '$lib/stores'
   import Labels from '$lib/Labels.svelte'
   import Waveform from '$lib/Waveform.svelte'
   import WaveformGrid from '$lib/WaveformGrid.svelte'
@@ -25,7 +25,11 @@
 </script>
 
 {#key $page.params.track}
-  <AudioContext trackId={$page.params.track} />
+  <AudioContext
+    trackId={$page.params.track}
+    beats={data.inferences.beats}
+    downbeats={data.inferences.downbeats}
+  />
 
   <div class="grid grid-cols-[6rem_auto] divide-y my-2">
     <div class="flex flex-row">
@@ -142,7 +146,17 @@
     <div class="px-2">
       <button
         type="button"
-        class="btn btn-sm h-7 w-10 variant-ghost-primary"
+        class="btn btn-sm h-7 w-7 p-0 text-lg"
+        class:variant-ghost-primary={$metronome}
+        class:variant-soft-primary={!$metronome}
+        on:click={() => ($metronome = !$metronome)}
+      >
+        <Icon icon="ph:metronome" />
+      </button>
+
+      <button
+        type="button"
+        class="btn btn-sm h-7 w-7 p-0 text-lg variant-ghost-primary"
         on:click={() => ($paused = !$paused)}
       >
         {#if $paused}
