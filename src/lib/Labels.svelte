@@ -12,7 +12,7 @@
 
   let mounted: boolean = false
   let div: HTMLDivElement
-  let data: any[] = []
+  let preds: any[] = []
 
   $: if (!$loading) render()
 
@@ -27,47 +27,60 @@
     const rect = div.getBoundingClientRect()
     const witdh = rect.width
 
-    data = labels
+    preds = instantiateAndFilter(labels, boundaries).map(({ label, boundary }) => {
+      let color = COLOR.LABEL_CORRECT
+      let textColor = 'text-white'
+
+      if (trueLabels.length > 0) {
+        const trues = instantiateAndFilter(trueLabels, trueBoundaries)
+        const diffs = trues.map((tru) => Math.abs(tru.boundary - boundary))
+        const min = Math.min(...diffs)
+        const wrongBoundary = min > 0.5
+
+        let wrongLabel
+        if (!wrongBoundary) wrongLabel = trues[diffs.indexOf(min)].label !== label
+        else {
+          const trueIndex = Math.max(
+            0,
+            trues.findLastIndex((tru) => tru.boundary < boundary),
+          )
+          wrongLabel = trues[trueIndex].label !== label
+        }
+
+        if (wrongBoundary && wrongLabel) {
+          color = COLOR.LABEL_SUPER_WRONG
+        } else if (wrongBoundary || wrongLabel) {
+          color = COLOR.LABEL_WRONG
+          textColor = 'text-black'
+        }
+      }
+
+      return {
+        text: label.charAt(0).toUpperCase() + label.slice(1),
+        position: Math.round((boundary / $duration) * witdh),
+        boundary,
+        color,
+        textColor,
+      }
+    })
+  }
+
+  function instantiateAndFilter(labels: string[], boundaries: number[]) {
+    return labels
       .map((label, i) => ({ label, boundary: boundaries[i] }))
       .filter(
         ({ label, boundary }) =>
           label !== 'start' && label !== 'end' && boundary >= 0 && boundary < $duration,
       )
-      .map(({ label, boundary }) => {
-        let color = COLOR.LABEL_CORRECT
-        let textColor = 'text-white'
-        if (trueLabels.length > 0) {
-          // TODO: trueBoundaries 에서도 start, end 지워야함
-          const diffs = trueBoundaries.map((tru) => Math.abs(tru - boundary))
-          const min = Math.min(...diffs)
-          const wrongBoundary = min > 0.5
-          const wrongLabel = trueLabels[diffs.indexOf(min)] !== label
-
-          if (wrongBoundary && wrongLabel) {
-            color = COLOR.LABEL_SUPER_WRONG
-          } else if (wrongBoundary || wrongLabel) {
-            color = COLOR.LABEL_WRONG
-            textColor = 'text-black'
-          }
-        }
-
-        return {
-          text: label.charAt(0).toUpperCase() + label.slice(1),
-          position: Math.round((boundary / $duration) * witdh),
-          boundary,
-          color,
-          textColor,
-        }
-      })
   }
 
   function seekToBoundary(i: number) {
-    seekTo(data[i].boundary)
+    seekTo(preds[i].boundary)
   }
 </script>
 
 <div class="h-6 relative" bind:this={div}>
-  {#each data as x, i}
+  {#each preds as x, i}
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <div
       class="labelbox absolute flex flex-row h-full {x.textColor}"

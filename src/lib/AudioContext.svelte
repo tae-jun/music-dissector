@@ -39,6 +39,7 @@
 
   function destroySources() {
     sources.forEach((source) => {
+      source.onended = null
       source.stop()
       source.disconnect()
     })
@@ -121,6 +122,10 @@
       gainNodes.push(gainNode)
     })
     applyMutes(get(mutes))
+
+    sources[0].onended = () => {
+      if (!get(paused)) paused.set(true)
+    }
 
     startTime = audioCtx.currentTime
 
