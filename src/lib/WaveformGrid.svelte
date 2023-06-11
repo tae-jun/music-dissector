@@ -1,9 +1,9 @@
 <script lang="ts">
   import { onDestroy, onMount } from 'svelte'
   import { paused } from '$lib/stores'
-  import { FPS, WINDOW_SECONDS, FRAMES_PER_WINDOW, BEAT_TOLERANCE } from '$lib/config'
+  import { FPS, WINDOW_SECONDS, FRAMES_PER_WINDOW, BEAT_TOLERANCE, COLOR } from '$lib/config'
   import { getPlaybackTime } from './AudioContext.svelte'
-  import { excludeDownbeats, processGridLine, type GridLine } from '$lib/utils'
+  import { excludeDownbeats, processGridLine, type GridLine, getCssVarColorAsHex } from '$lib/utils'
 
   export let predBeats: number[]
   export let predDownbeats: number[]
@@ -18,13 +18,9 @@
   let dpr: number
   let hopSize: number
 
-  // predBeats = excludeDownbeats(predBeats, predDownbeats)
-  // trueBeats = excludeDownbeats(trueBeats, trueDownbeats)
-
   let beats: GridLine[] = processGridLine(predBeats, trueBeats)
   const downbeats: GridLine[] = processGridLine(predDownbeats, trueDownbeats)
 
-  console.log('numBeats', beats.length, 'numDownbeats', downbeats.length)
   beats = beats.filter(({ pred: predBeat }) => {
     const predDiffs = downbeats.map(({ pred: predDownbeat }) => Math.abs(predDownbeat - predBeat))
     const trueDiffs = downbeats.map(({ true: trueDownbeat }) => Math.abs(trueDownbeat - predBeat))
@@ -39,9 +35,6 @@
       return false
     }
   })
-  console.log('numBeatsFiltered', beats.length, 'numDownbeats', downbeats.length)
-
-  console.log(predBeats, trueBeats, beats)
 
   $: if (!$paused) {
     draw()
@@ -83,8 +76,9 @@
   }
 
   function drawGrids() {
-    drawGrid(beats, '#FFFC', true)
-    drawGrid(downbeats, '#FFFC')
+    drawGrid(beats, '#FFFE', true)
+    // drawGrid(downbeats, '#FFFC')
+    drawGrid(downbeats, '#FFFE')
   }
 
   function drawGrid(gridLines: GridLine[], color: string, dottedLine: boolean = false) {
@@ -106,8 +100,8 @@
 
     ctx.save()
     ctx.lineWidth = dpr * 1
-    const dashWidth = 4 * dpr
-    if (dottedLine) ctx.setLineDash([dashWidth, dashWidth])
+    const dashWidth = 8 * dpr
+    if (dottedLine) ctx.setLineDash([dashWidth, dpr * 2])
 
     ctx.strokeStyle = color
     ctx.beginPath()
@@ -118,12 +112,8 @@
     ctx.stroke()
 
     for (const [predX, trueX] of wrongGridLineXs) {
-      // ctx.fillStyle = '#FF000020' // red color
-      // ctx.fillRect(Math.min(trueX, predX), 0, Math.abs(predX - trueX), height) // x, y, width, height
-
-      ctx.lineWidth = dpr * 2
+      ctx.lineWidth = dpr * 1
       ctx.beginPath()
-      // ctx.strokeStyle = COLOR.BEAT_CORRECT
       ctx.strokeStyle = color
       ctx.moveTo(trueX, 0)
       ctx.lineTo(trueX, height)
@@ -131,8 +121,8 @@
 
       ctx.lineWidth = dpr * 2
       ctx.beginPath()
-      // ctx.strokeStyle = COLOR.BEAT_WRONG
-      ctx.strokeStyle = '#F00B'
+      if (dottedLine) ctx.strokeStyle = COLOR.GRID_WRONG_BEAT
+      else ctx.strokeStyle = COLOR.GRID_WRONG_DOWNBEAT
       ctx.moveTo(predX, 0)
       ctx.lineTo(predX, height)
       ctx.stroke()

@@ -9,7 +9,8 @@
   import AudioContext from '$lib/AudioContext.svelte'
   import TimeDisplay from '$lib/TimeDisplay.svelte'
   import WaveformTitle from '$lib/WaveformTitle.svelte'
-  import WrongBeats from '$lib/WrongBeats.svelte'
+  import WrongBeatsNew from '$lib/WrongBeatsNew.svelte'
+  import SharedCanvas from '$lib/SharedCanvas.svelte'
 
   export let data
 
@@ -43,23 +44,18 @@
       />
     </div>
 
-    <div />
-    <div class="w-full h-1.5">
-      {#if data.scores.downbeat.f1 == 1.0}
-        <div class="bg-secondary-700 w-full h-full" />
-      {:else}
-        <WrongBeats preds={data.inferences.downbeats} trues={data.truths.downbeats} />
-      {/if}
-    </div>
-
-    <div />
-    <div class="w-full h-1.5">
-      {#if data.scores.beat.f1 == 1.0}
-        <div class="bg-secondary-700 w-full h-full" />
-      {:else}
-        <WrongBeats preds={data.inferences.beats} trues={data.truths.beats} />
-      {/if}
-    </div>
+    {#if data.scores.beat.f1 === 1.0 && data.scores.downbeat.f1 === 1.0}
+      <div class="bg-secondary-600 h-1" />
+      <div class="bg-secondary-600 h-1" />
+    {:else}
+      <div />
+      <div class="w-full h-1.5">
+        <SharedCanvas>
+          <WrongBeatsNew preds={data.inferences.beats} trues={data.truths.beats} />
+          <WrongBeatsNew circle preds={data.inferences.downbeats} trues={data.truths.downbeats} />
+        </SharedCanvas>
+      </div>
+    {/if}
 
     <div class="navigator-label">Drum</div>
     <div><Navigator energy={data.nav.drum} /></div>
