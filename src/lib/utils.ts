@@ -1,8 +1,17 @@
 import { browser } from "$app/environment"
 import { BEAT_TOLERANCE } from "./config"
 
-export function getCssVarColorAsHex(cssVar: string): string {
+export async function getCssVarColorAsHex(cssVar: string): Promise<string> {
   if (!browser) return ''
+
+  // Wait for the DOM to be ready
+  await new Promise<void>(resolve => {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => resolve())
+    } else {
+      resolve()
+    }
+  })
 
   // Get CSS Variable
   let rootStyle = getComputedStyle(document.documentElement)
