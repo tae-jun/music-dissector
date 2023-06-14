@@ -11,6 +11,7 @@
   import WaveformTitle from '$lib/WaveformTitle.svelte'
   import WrongBeats from '$lib/WrongBeats.svelte'
   import SharedCanvas from '$lib/SharedCanvas.svelte'
+  import { base } from '$app/paths'
 
   export let data
 
@@ -172,10 +173,10 @@
     <!-- Tail -->
     <div class="flex flex-row items-end justify-end">
       <a href="https://mac.kaist.ac.kr/" target="_blank">
-        <img class="img-bar" src="/maclab.png" />
+        <img class="img-bar" src="{base}/maclab.png" />
       </a>
       <a href="https://kaist.ac.kr/" target="_blank" style="margin-left: 0.3rem">
-        <img class="img-bar" src="/kaist.png" />
+        <img class="img-bar" src="{base}/kaist.png" />
       </a>
     </div>
   </div>
