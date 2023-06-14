@@ -126,8 +126,9 @@
   </div>
 
   <!-- Bottom Bar -->
-  <div class="flex flex-row items-center justify-start">
-    <div class="px-2" style="width: 6rem;">
+  <div class="grid grid-cols-3">
+    <!-- Lead -->
+    <div class="items-center justify-start px-2" style="width: 6rem;">
       <button
         type="button"
         class="btn btn-sm w-10 h-7"
@@ -141,9 +142,8 @@
       </button>
     </div>
 
-    <div class="grow" />
-
-    <div class="px-2">
+    <!-- Center -->
+    <div class="flex flex-row items-center justify-center">
       <button
         type="button"
         class="btn btn-sm h-7 w-7 p-0 text-lg"
@@ -156,7 +156,7 @@
 
       <button
         type="button"
-        class="btn btn-sm h-7 w-7 p-0 text-lg variant-ghost-primary"
+        class="btn btn-sm h-7 w-7 mx-1 p-0 text-lg variant-ghost-primary"
         on:click={() => ($paused = !$paused)}
       >
         {#if $paused}
@@ -165,10 +165,19 @@
           <Icon icon="ph:pause" />
         {/if}
       </button>
-    </div>
-    <div class="px-1"><TimeDisplay /></div>
 
-    <div class="grow" />
+      <div class="mx-1"><TimeDisplay /></div>
+    </div>
+
+    <!-- Tail -->
+    <div class="flex flex-row items-end justify-end">
+      <a href="https://mac.kaist.ac.kr/" target="_blank">
+        <img class="img-bar" src="/maclab.png" />
+      </a>
+      <a href="https://kaist.ac.kr/" target="_blank" style="margin-left: 0.3rem">
+        <img class="img-bar" src="/kaist.png" />
+      </a>
+    </div>
   </div>
 
   <div class="flex flex-row">
@@ -231,5 +240,14 @@
   }
   div {
     @apply border-surface-600;
+  }
+
+  .img-bar {
+    @apply h-6;
+    filter: brightness(85%);
+    transition: all 200ms ease-in-out;
+  }
+  .img-bar:hover {
+    filter: brightness(100%);
   }
 </style>

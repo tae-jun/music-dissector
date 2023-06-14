@@ -41,24 +41,18 @@
         </a>
       </svelte:fragment>
 
-      {#if $page.url.pathname !== '/about'}
-        <select class="select w-96 py-0.5" bind:value={selected} on:change={redirect}>
-          {#each tracks as track}
-            <option value={track}>{track}</option>
-          {/each}
-          <!-- <option value="1">NewJeans - Hype Boy</option>
-          <option value="2">Option 2</option>
-          <option value="3">Option 3</option>
-          <option value="4">Option 4</option>
-          <option value="5">Option 5</option> -->
-        </select>
-      {/if}
+      <svelte:fragment slot="default">
+        {#if $page.url.pathname !== '/about'}
+          <select class="select w-96 py-0.5" bind:value={selected} on:change={redirect}>
+            {#each tracks as track}
+              <option value={track}>{track}</option>
+            {/each}
+          </select>
+        {/if}
+      </svelte:fragment>
 
       <svelte:fragment slot="trail">
-        <a class="btn btn-sm variant-ghost-surface" href="https://github.com/skeletonlabs/skeleton">
-          GitHub
-        </a>
-        <a class="btn btn-sm variant-ghost-surface" href="/about"> About </a>
+        <a class="btn-bar" href="{base}/about"> About </a>
       </svelte:fragment>
     </AppBar>
   </svelte:fragment>
@@ -66,3 +60,15 @@
   <Spinner />
   <slot />
 </AppShell>
+
+<style>
+  .btn-bar {
+    @apply px-0.5;
+    line-height: 1.25rem;
+    border-bottom: 2px solid rgb(var(--color-surface-500));
+    transition: all 200ms ease-in-out;
+  }
+  .btn-bar:hover {
+    border-bottom: 2px solid rgb(var(--color-surface-300));
+  }
+</style>
