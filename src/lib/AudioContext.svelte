@@ -168,7 +168,7 @@
     oscillator.connect(envelope)
     envelope.connect(audioCtx.destination)
 
-    envelope.gain.value = 4
+    envelope.gain.value = 16
     envelope.gain.exponentialRampToValueAtTime(4, time + 0.001)
     envelope.gain.exponentialRampToValueAtTime(1e-8, time + 0.02)
 
