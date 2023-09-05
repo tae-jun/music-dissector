@@ -33,29 +33,36 @@
 <!-- App Shell -->
 <AppShell>
   <svelte:fragment slot="header">
-    <!-- App Bar -->
-    <AppBar gridColumns="grid-cols-3" slotDefault="place-self-center" slotTrail="place-content-end">
-      <svelte:fragment slot="lead">
-        <a href={base || '/'}>
-          <strong class="text-xl"> Music Dissector </strong>
-        </a>
-      </svelte:fragment>
+    {#if $page.url.pathname !== '/about'}
+      <!-- App Bar -->
+      <AppBar
+        gridColumns="grid-cols-3"
+        slotDefault="place-self-center"
+        slotTrail="place-content-end"
+      >
+        <svelte:fragment slot="lead">
+          <a href={base || '/'}>
+            <strong class="text-xl"> Music Dissector </strong>
+          </a>
+        </svelte:fragment>
 
-      <svelte:fragment slot="default">
-        {#if $page.url.pathname !== '/about'}
-          <select class="select w-96 py-0.5" bind:value={selected} on:change={redirect}>
-            {#each tracks as track}
-              <option value={track}>{track}</option>
-            {/each}
-          </select>
-        {/if}
-      </svelte:fragment>
+        <svelte:fragment slot="default">
+          {#if $page.url.pathname !== '/about'}
+            <select class="select w-96 py-0.5" bind:value={selected} on:change={redirect}>
+              {#each tracks as track}
+                <option value={track}>{track}</option>
+              {/each}
+            </select>
+          {/if}
+        </svelte:fragment>
 
-      <svelte:fragment slot="trail">
-        <a class="btn-bar" href="{base}/about"> About </a>
-      </svelte:fragment>
-    </AppBar>
+        <svelte:fragment slot="trail">
+          <a class="btn-bar" href="{base}/about"> About </a>
+        </svelte:fragment>
+      </AppBar>
+    {/if}
   </svelte:fragment>
+
   <!-- Page Route Content -->
   <Spinner />
   <slot />
