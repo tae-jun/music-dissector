@@ -33,7 +33,7 @@
 <!-- App Shell -->
 <AppShell>
   <svelte:fragment slot="header">
-    {#if $page.url.pathname !== '/about'}
+    {#if !$page.url.pathname.endsWith('/about')}
       <!-- App Bar -->
       <AppBar
         gridColumns="grid-cols-3"
@@ -47,13 +47,11 @@
         </svelte:fragment>
 
         <svelte:fragment slot="default">
-          {#if $page.url.pathname !== '/about'}
             <select class="select w-96 py-0.5" bind:value={selected} on:change={redirect}>
               {#each tracks as track}
                 <option value={track}>{track}</option>
               {/each}
             </select>
-          {/if}
         </svelte:fragment>
 
         <svelte:fragment slot="trail">
